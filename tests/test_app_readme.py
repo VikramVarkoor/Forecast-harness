@@ -325,3 +325,10 @@ def test_story_text_backs_up_the_storm_headline():
     text = " ".join(a.plain_summary(df, hl, {}, reasons))
     assert "blind spot" in text and "05 February" in text and "Major winter storm" in text and "last four Tuesdays" in text
     assert "blind spot" not in " ".join(a.plain_summary(df, hl, {}, reasons.iloc[0:0]))
+
+
+def test_combined_readme_has_both_domains_and_no_stale_claims(tmp_path):
+    """Domain B section is built from elec results; with none present the README is still valid Domain A only."""
+    assert "demoted" not in make_readme.combine("# NYC ride-hail day-ahead demand forecast\n## Findings\nx\n")
+    t = make_readme.combine("# NYC ride-hail day-ahead demand forecast\n## Findings\nx\n")
+    assert t.startswith("# Day-ahead forecasting, two domains") and "## A. NYC" in t and "### Findings" in t

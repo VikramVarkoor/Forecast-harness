@@ -223,6 +223,3 @@ The Holds, Fails and Untested labels stamp onto their rows one after another (16
 Chose: `src/make_readme.py` now writes one README. Domain A text is unchanged (headings demoted one level). Domain B is appended from `make_site_elec.build(results)`, so its numbers are the same ones on the site and wording follows the sign of the result. It is skipped if the electricity run has not happened.
 Licence: I read the OPSD time_series and weather_data pages. Both give a citation form and neither states a licence in the page text. I did not find or verify one. The README says so and tells the reader to check the data package metadata before redistributing derived data. Not verified: the licence itself.
 Why not guess: a wrong licence line would be a false claim, and the project rule is no overclaiming.
-
-## D84 Electricity banner: endless transmission line
-Chose: a strip across the top of the electricity banner with pylons, two wires and pulses of load that run along them forever, the counterpart of the taxi road. Pulses use transform only (the same east/west keyframes as the cabs). Reduced motion shows them parked. Shown on Story and Dashboard. Decorative, aria-hidden, no data in it, so nothing here is a claim about the results.

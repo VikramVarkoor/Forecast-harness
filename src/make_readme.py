@@ -6,6 +6,7 @@ Reads results/*.csv and docs/day_reasons.csv. Prose that states a fact about the
 the numbers; fixed prose only describes method and limits. Nothing here is a model run.
 """
 import json
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -40,6 +41,85 @@ def table(path):
 
 def pct(a, b):
     return 100 * (b - a) / b
+
+
+AI_LINE = "Built with AI assistance (Claude) for code and drafting; the decisions log, runs and checks are mine to explain."
+
+
+def elec_section():
+    """Domain B text, every number from results/elec_* via make_site_elec.build. Empty if that run has not happened."""
+    if not (R / "elec_heldout_predictions.parquet").exists():
+        return ""
+    from src.make_site_elec import build
+    d = build(R)
+    c, w = d["compare"], d.get("weather")
+    strip = lambda t: re.sub(r"<[^>]+>", "", t)
+    cty = pd.DataFrame([{"country": x["name"], "mean load MW": x["mean_load"], "model MAPE %": x["mape_model"],
+                         "simple guess MAPE %": x["mape_base"], "operator MAPE %": x["mape_op"],
+                         "operator series flagged": "yes" if x["flagged"] else ""} for x in d["countries"]])
+    f1, f2, f3 = (lambda v: f"{v:.1f}"), (lambda v: f"{v:.2f}"), (lambda v: f"{v:.3f}")
+    tbl = pd.DataFrame([["LightGBM (mine)", f1(c["model_mae"]), f2(c["model_mape"]), f3(c["model_mase"])],
+                        [c["base_label"] + " (simple guess)", f1(c["base_mae"]), f2(c["base_mape"]), f3(c["base_mase"])],
+                        ["Operator day-ahead forecast (not like for like)", f1(c["op_mae"]), f2(c["op_mape"]), f3(c["op_mase"])]],
+                       columns=["model", "MAE MW", "MAPE %", "MASE"])
+    wx = ""
+    if w:
+        wx = (f"\n### Weather test\n\nSeparate window, {w['window']} ({w['n_days']} days), run once (`results/elec_weather_run.json`).\n\n"
+              + "\n\n".join(strip(t) for t in w["plain"]) + "\n\nCaveats:\n\n" + "\n".join(f"- {t}" for t in w["caveats"]) + "\n")
+    return f"""## B. European electricity day-ahead load forecast
+
+Hourly national load for {len(d['countries'])} countries, forecast at midnight for the next 24 hours, scored by the same rolling-origin harness idea as Domain A.
+Every number in this section is computed from `results/elec_*` files by `src/make_site_elec.py`.
+
+### Findings
+
+- {d['verdict']}
+{chr(10).join('- ' + strip(t).replace(' on a separate window, in the Weather tab.', ' on a separate window (see Weather test below).') for t in d['plain'])}
+- {d['findings'][2]['big']} of actual hours fell inside the 10% to 90% range. {d['findings'][2]['sub']}
+
+Held-out ({c['n_days']} days, scored once; lower is better):
+
+{md(tbl)}
+
+By country (MAPE):
+
+{md(cty, 2)}
+{wx}
+### Limits
+
+{chr(10).join('- ' + t for t in d['limits'])}
+
+### Method
+
+{chr(10).join(f'{i}. {t}' for i, t in enumerate(d['method'], 1))}
+
+### Reproduce
+
+```
+python -m src.opsd_download
+python -m src.elec_data
+python -m src.elec_run dev
+python -m src.elec_run final      # once; a second run is refused
+python -m src.opsd_weather && python -m src.elec_weather_run   # once
+python -m src.make_site           # builds the static site, including elec.html
+```
+
+### Data and credit
+
+{d['data_note']} Cite as: Open Power System Data. 2020. Data Package Time series. Version 2020-10-06. https://doi.org/10.25832/time_series/2020-10-06.
+Weather: Open Power System Data. 2020. Data Package Weather Data. Version 2020-09-16. https://doi.org/10.25832/weather_data/2020-09-16.
+The OPSD pages I read do not state a licence in the page text. I did not verify one, so check the data package metadata before redistributing derived data. Raw data is not in this repository.
+"""
+
+
+def combine(taxi):
+    """Two domains in one README: Domain A headings demoted one level, Domain B appended."""
+    a = re.sub(r"^## ", "### ", taxi, flags=re.M)
+    a = a.replace("# NYC ride-hail day-ahead demand forecast", "## A. NYC ride-hail day-ahead demand forecast", 1)
+    head = ("# Day-ahead forecasting, two domains\n\nTwo forecasting projects built with the same discipline: forecasts made from the night before, "
+            "a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. "
+            "Decisions were written before code (`DECISIONS*.md`).\n\n")
+    return head + a.rstrip() + "\n\n" + elec_section() + "\n" + AI_LINE + "\n"
 
 
 def main():
@@ -159,8 +239,8 @@ streamlit run app/app.py
 NYC Taxi and Limousine Commission, TLC Trip Record Data (HVFHV). Zone names from the TLC Taxi Zone Lookup Table (`app/taxi_zone_lookup.csv`). Holidays from the `holidays` package. The TLC terms of use were not
 verified in this project; check them before redistributing derived data. Raw data is not in this repository.
 
-Built with AI assistance (Claude) for code and drafting; the decisions log, runs and checks are mine to explain.
 """
+    text = combine(text)
     (ROOT / "README.md").write_text(text)
     print("wrote README.md")
 
