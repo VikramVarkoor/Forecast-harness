@@ -87,8 +87,17 @@
     if (!reduced && isFinite(v)) { var t0 = performance.now(), dur = 1400; (function tick(now) { var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); n.textContent = (v * e).toFixed(1) + suffix; if (k < 1) requestAnimationFrame(tick); else n.textContent = text; })(t0); }
     return n;
   }
+  /* A transmission line across the top of the banner: pylons, two wires, and pulses of load that run along them for as long as the page is open. */
+  function gridLine(h) {
+    var g = el("div", "grid"); g.setAttribute("aria-hidden", "true");
+    [["east", 9, .1, 1], ["east", 9, .6, 1], ["west", 12, .3, 2], ["west", 12, .85, 2], ["east", 15, .45, 2], ["east", 5.5, .7, 1, "surge"]].forEach(function (p) {
+      var d = el("span", "pls l" + p[3] + (p[4] ? " " + p[4] : "")); d.style.setProperty("--dir", p[0]); d.style.setProperty("--dur", p[1] + "s"); d.style.setProperty("--delay", (-p[1] * p[2]).toFixed(2) + "s"); d.style.setProperty("--off", (p[2] * 90).toFixed(0) + "vw"); g.appendChild(d);
+    });
+    h.appendChild(g);
+  }
   function hero(compact) {
     var c = D.hero, h = $("#hero"); h.className = "hero" + (compact ? " compact" : ""); h.replaceChildren();
+    gridLine(h);
     if (!compact) loadCurve(h);
     var wrap = el("div", "wrap"), inn = el("div", "hero-in"), left = el("div");
     left.appendChild(el("p", "hero-kicker" + (compact ? "" : " lead"), c.kicker)); left.appendChild(bigNumber(c.pct)); left.appendChild(el("p", "hero-cap", c.cap)); if (!compact) left.appendChild(el("p", "hero-fine", c.fine)); inn.appendChild(left);

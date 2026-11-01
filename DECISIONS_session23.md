@@ -218,3 +218,11 @@ S&P card: the article's own lead photo (credited in the article to 101cats via G
 
 ## D82: status stamps on the electricity page
 The Holds, Fails and Untested labels stamp onto their rows one after another (160 ms apart) the first time the section scrolls into view, same as the ride-hail page. Skipped under reduced motion, and a 12 s timer shows them anyway if the scroll watcher never fires.
+
+## D83 Wrap-up: one README for both domains, OPSD licence check
+Chose: `src/make_readme.py` now writes one README. Domain A text is unchanged (headings demoted one level). Domain B is appended from `make_site_elec.build(results)`, so its numbers are the same ones on the site and wording follows the sign of the result. It is skipped if the electricity run has not happened.
+Licence: I read the OPSD time_series and weather_data pages. Both give a citation form and neither states a licence in the page text. I did not find or verify one. The README says so and tells the reader to check the data package metadata before redistributing derived data. Not verified: the licence itself.
+Why not guess: a wrong licence line would be a false claim, and the project rule is no overclaiming.
+
+## D84 Electricity banner: endless transmission line
+Chose: a strip across the top of the electricity banner with pylons, two wires and pulses of load that run along them forever, the counterpart of the taxi road. Pulses use transform only (the same east/west keyframes as the cabs). Reduced motion shows them parked. Shown on Story and Dashboard. Decorative, aria-hidden, no data in it, so nothing here is a claim about the results.

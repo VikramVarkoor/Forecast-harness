@@ -490,3 +490,17 @@ html[data-domain="elec"][data-theme="dark"] {--t-model: #4CD7F6; --t-actual: #F2
 .tile {min-width: 0; overflow-wrap: anywhere;}
 @media (max-width: 520px) {.tile {padding: .35rem .3rem; min-height: 3.6rem;} .tile b {font-size: 1rem;} .tile .tv {font-size: .64rem;}}
 .news-img.contain {background-color: #fff; background-size: contain; background-repeat: no-repeat; background-position: center;}
+
+/* the transmission line across the electricity banner: two wires, pylons, and pulses of load running along them */
+html[data-domain="elec"] .grid {position: absolute; left: 0; right: 0; top: 14px; height: 46px; overflow: hidden; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='46' viewBox='0 0 160 46'%3E%3Cg fill='none' stroke='%232a3d62' stroke-width='1.6' stroke-linejoin='round'%3E%3Cpath d='M68 46L80 8L92 46M71 36H89M74 26H86M80 8V2M62 16H98M68 28H92'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0 / 160px 46px;}
+html[data-domain="elec"] .grid::before, html[data-domain="elec"] .grid::after {content: ""; position: absolute; left: 0; right: 0; height: 1px; background: rgba(120, 160, 220, .35);}
+html[data-domain="elec"] .grid::before {top: 16px;}
+html[data-domain="elec"] .grid::after {top: 28px;}
+html[data-domain="elec"] .hero.compact .grid {top: 8px;}
+html[data-domain="elec"] .pls {position: absolute; left: 0; width: 46px; height: 3px; margin-top: -1px; border-radius: 2px; z-index: 1;
+  background: linear-gradient(90deg, transparent, var(--taxi)); box-shadow: 0 0 8px 1px rgba(76, 215, 246, .7); animation: var(--dir) var(--dur) linear var(--delay) infinite; will-change: transform;}
+html[data-domain="elec"] .pls.l1 {top: 16px;}
+html[data-domain="elec"] .pls.l2 {top: 28px; width: 34px; opacity: .8;}
+html[data-domain="elec"] .pls.surge {width: 90px; height: 4px; background: linear-gradient(90deg, transparent, #fff); box-shadow: 0 0 14px 3px rgba(76, 215, 246, .9);}
+@media (prefers-reduced-motion: reduce) {html[data-domain="elec"] .pls {animation: none; transform: translateX(var(--off));}}
