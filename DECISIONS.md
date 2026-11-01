@@ -89,7 +89,7 @@ Four, all scored by exactly the same backtest function as any model:
 
 ## D12. Evaluation origins and warm-up (changed from D6)
 
-- All models are scored on the same origins, which now start 8 weeks into the data (`--min-history-weeks 8`) so LightGBM has enough history to train. This shrinks the origin set slightly, so the baseline numbers move a little from the session 2 run. Compare models only within one run_models output.
+- All models are scored on the same origins, which now start 8 weeks into the data (`--min-history-weeks 8`) so LightGBM has enough history to train. This shrinks the origin set slightly, so the baseline numbers move a little from the step 2 run. Compare models only within one run_models output.
 
 ## D13. Models (done in code, development backtest only)
 
