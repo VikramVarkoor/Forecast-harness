@@ -1,4 +1,4 @@
-# Session 23 decisions
+# Decisions, part 23
 
 ## D38: Ticket-stub cards, three typefaces embedded in the page
 - The yellow left border is gone. Cards are now tickets: a hard offset shadow (black in light mode, taxi yellow in dark), a tinted stub holding the big figure, a dashed tear line with notched edges, then the body. News cards put the lead image on top with a date stamp and the credit on the image. Hover lifts the card; reduced-motion turns that off; keyboard focus keeps a visible outline.

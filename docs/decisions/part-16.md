@@ -1,4 +1,4 @@
-# Session 16 decisions
+# Decisions, part 16
 
 ## D31: Clearer hero, five new features, dark-mode fixes
 - Hero copy was ambiguous ("fewer misses" of what, and "simple rule" undefined). It now says "lower forecast error than a simple rule of thumb (the average of that same hour over the last 4 weeks). Tested on N days the model never saw, scored once." The two side numbers are labelled "The model is off by" and "The rule of thumb is off by", with the unit "rides per zone per hour" printed under each.

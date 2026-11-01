@@ -1,4 +1,4 @@
-"""Session 4a: analysis of the development backtest. Reads results/predictions.parquet.
+"""Step 4a: analysis of the development backtest. Reads results/predictions.parquet.
 
     python -m src.analyze [--baseline mean_same_hour_4w]
 

@@ -1,4 +1,4 @@
-# Session 17 decisions
+# Decisions, part 17
 
 ## D32: Remove click-to-open help tooltips
 - Streamlit's "?" help popovers stay open once clicked, stack on top of each other, and followed the visitor into other tabs (a stale popover appeared over the Where it fails tab). There is no setting to close them on blur.

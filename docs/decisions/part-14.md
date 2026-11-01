@@ -1,4 +1,4 @@
-# Session 14 decisions
+# Decisions, part 14
 
 ## D29: Equal-height cards, tighter bottom, visible view switch
 - Finding cards, test-step cards and next-step cards are now rendered inside one CSS grid (`.cards`, `card_grid()`), not Streamlit columns, so every card in a row has the same height. Verified by measuring: 158/158, 156x4, 176x4 px.

@@ -21,7 +21,7 @@ Given everything known at midnight, forecast hourly demand for the next 24 hours
 
 - The most recent 12 published months, all after 5 January 2025 (congestion relief charge start, `cbd_congestion_fee` column present).
 - Reason: a level shift in Manhattan zones would distort a model trained across the boundary.
-- Cut-scope fallback: 6 months, if session 1 runs 50 percent over.
+- Cut-scope fallback: 6 months, if step 1 runs 50 percent over.
 - Final 4 weeks of data are the held-out set. Not touched until the very end.
 
 ## D3. Zones (planned)
@@ -64,7 +64,7 @@ Four, all scored by exactly the same backtest function as any model:
 - Two independent checks. (1) Truncation invariance: features for the origin day must not change when all data at or after the origin is removed. (2) Recompute every lag and rolling feature from raw history by timestamp lookup, sharing no code with the pipeline, and compare.
 - Proof it works: tests plant a lag-23 leak, a centered rolling window and the target as a feature, and assert each is caught.
 
-## D9. Models, session 3 (planned)
+## D9. Models, step 3 (planned)
 
 - Exponential smoothing (statsmodels), LightGBM with lag 24, lag 168, rolling means, hour, day of week, holiday flag, zone. Simple average of LightGBM and best baseline. Quantile LightGBM at 10 and 90 percent.
 - No deep learning.

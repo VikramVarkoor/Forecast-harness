@@ -1,4 +1,4 @@
-# Session 13 decisions
+# Decisions, part 13
 
 ## D28: Story page opens with a verdict, closes with next steps
 - Removed the "In plain English" heading (too obvious). The plain paragraphs now sit under a one-sentence verdict set as large type.

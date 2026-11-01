@@ -1,4 +1,4 @@
-# Session 22 decisions
+# Decisions, part 22
 
 ## D37: Third source card swapped to one with a real lead image
 - The arXiv paper has no lead image, so its card showed a short checker band and broke the row. It is replaced by Lyft Engineering, "Real-Time Spatial Temporal Forecasting @ Lyft" (Josh Xi and Rakesh Kumar, 5 May 2025), read in full metadata: its subtitle is "Reliability and Simplicity: A Look at Classical Time-Series Models for Real-Time Forecasting", and its intro lists real-time rider pricing, driver incentives, budget allocation and planning as uses of forecasts. The card's one-line reason stays within that.

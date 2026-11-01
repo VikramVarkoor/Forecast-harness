@@ -118,7 +118,7 @@ def combine(taxi):
     a = a.replace("# NYC ride-hail day-ahead demand forecast", "## A. NYC ride-hail day-ahead demand forecast", 1)
     head = ("# Day-ahead forecasting, two domains\n\nTwo forecasting projects built with the same discipline: forecasts made from the night before, "
             "a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. "
-            "Decisions were written before code (`DECISIONS*.md`).\n\n")
+            "Decisions were written before code (`DECISIONS.md` and `docs/decisions/`).\n\n")
     return head + a.rstrip() + "\n\n" + elec_section() + "\n" + AI_LINE + "\n"
 
 

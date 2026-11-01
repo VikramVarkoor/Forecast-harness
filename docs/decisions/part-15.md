@@ -1,4 +1,4 @@
-# Session 15 decisions
+# Decisions, part 15
 
 ## D30: Dashboard looks different from the Story, plus a takeaway under the chart
 - Switching from the bottom of the Story page still felt unclear: the scroll jumped to the top but the big yellow hero looked identical, so nothing seemed to change. The Dashboard now uses a compact hero (small meter, two numbers, a kicker that says "Dashboard") so the chart sits above the fold and the page visibly changes. The hero moved inside the keyed view container so it animates with the rest.

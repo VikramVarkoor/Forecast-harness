@@ -1,4 +1,4 @@
-"""Plots for session 1: daily and weekly pattern for 3 zones (busy, mid, quiet)."""
+"""Plots for step 1: daily and weekly pattern for 3 zones (busy, mid, quiet)."""
 import sys
 from pathlib import Path
 

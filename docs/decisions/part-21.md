@@ -1,4 +1,4 @@
-# Session 21 decisions
+# Decisions, part 21
 
 ## D36: Lead images on the source cards, linked not copied
 - Each card can show the article's own lead image, using the address the publisher puts in its og:image tag (read from the live pages: Uber blog, NY1). The image is not downloaded into the repository. The visitor's browser loads it from the publisher, as a link preview does, with a credit line under it ("Image: Uber", "Image: AP file photo, via NY1") and the whole card linking to the original.

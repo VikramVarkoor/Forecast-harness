@@ -1,4 +1,4 @@
-"""Session 3: every model through the same rolling-origin backtest, development weeks only.
+"""Step 3: every model through the same rolling-origin backtest, development weeks only.
 
     python -m src.run_models                    # full run
     python -m src.run_models --no-ets           # skip the slow statistical model

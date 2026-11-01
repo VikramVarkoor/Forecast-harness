@@ -1,4 +1,4 @@
-# Session 18 decisions
+# Decisions, part 18
 
 ## D33: Honest storm tab, loading message, share image
 - Storm days tab now says plainly that only days whose cause was read in a source are listed, and counts the other days where the miss was at least 1.5 times the typical day (computed from the data, dates shown). Their causes are explicitly not guessed.

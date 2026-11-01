@@ -1,4 +1,4 @@
-"""Session 2 deliverable: baselines ranked on the rolling-origin backtest.
+"""Step 2 deliverable: baselines ranked on the rolling-origin backtest.
 Holds out the final 4 weeks; this script never reads them.
 
     python src/run_baselines.py [--hourly data/hourly.parquet]
