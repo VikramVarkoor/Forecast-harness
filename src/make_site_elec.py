@@ -81,10 +81,20 @@ def build(res: Path):
         op_mw = f"In megawatts the difference is small and the 95% range runs from {p_mae.ci95_lo:+.0f} to {p_mae.ci95_hi:+.0f} MW a day, so I cannot say the model is ahead."
     else:
         op_mw = f"In megawatts the model was {abs(p_mae.gain):.0f} MW a day {'better' if p_mae.gain > 0 else 'worse'}, with a 95% range of {abs(min(p_mae.ci95_lo, p_mae.ci95_hi)):.0f} to {abs(max(p_mae.ci95_lo, p_mae.ci95_hi)):.0f}."
-    if crosses_zero(p_map.ci95_lo, p_map.ci95_hi):
+    mw_flat, pct_flat = crosses_zero(p_mae.ci95_lo, p_mae.ci95_hi), crosses_zero(p_map.ci95_lo, p_map.ci95_hi)
+    pct_rng = f"{min(abs(p_map.ci95_lo), abs(p_map.ci95_hi)):.2f} to {max(abs(p_map.ci95_lo), abs(p_map.ci95_hi)):.2f}"
+    pct_dir = "better" if p_map.gain > 0 else "worse"
+    weigh = "Megawatts count the big countries most, percent counts every country the same."
+    if mw_flat and pct_flat:
         op_pct = f"In percent the difference is also within noise ({p_map.ci95_lo:+.2f} to {p_map.ci95_hi:+.2f} points)."
+    elif mw_flat:
+        op_pct = (f"In percent the model was {abs(p_map.gain):.2f} points {pct_dir} (95% range {pct_rng}). {weigh} The two measures disagree, "
+                  f"so my conclusion stands on megawatts, the measure this page leads with: not clearly different.")
+    elif pct_flat:
+        op_pct = (f"In percent the difference is within noise ({p_map.ci95_lo:+.2f} to {p_map.ci95_hi:+.2f} points). {weigh} The two measures disagree, "
+                  f"so my conclusion stands on megawatts, the measure this page leads with.")
     else:
-        op_pct = f"In percent the model was {abs(p_map.gain):.2f} points {'better' if p_map.gain > 0 else 'worse'}, with a 95% range of {min(abs(p_map.ci95_lo), abs(p_map.ci95_hi)):.2f} to {max(abs(p_map.ci95_lo), abs(p_map.ci95_hi)):.2f}."
+        op_pct = f"In percent the model was {abs(p_map.gain):.2f} points {pct_dir}, with a 95% range of {pct_rng}."
 
     split = bool(op_wins_sane and mo_wins_sane)
     if crosses_zero(p_mae.ci95_lo, p_mae.ci95_hi):
@@ -108,13 +118,13 @@ def build(res: Path):
         worst.append(dict(i=[pd.Timestamp(x) for x in days].index(pd.Timestamp(d)), worst_code=str(e.idxmax()), date=label(d), day_mae=round(float(d_m[d])), times_typical=round(float(d_m[d] / med), 1),
                           worst_country=NAMES.get(e.idxmax(), e.idxmax()), worst_country_pct=round(float(e.max()), 1)))
     out = dict(
-        hero=dict(kicker="Can you predict how much electricity Europe will use tomorrow?", pct=f"{abs(gain):.1f}%", cap=("lower" if better else "higher") + " error than a simple guess.",
+        hero=dict(kicker="Can you predict how much electricity Europe will use tomorrow?", pct=f"{abs(gain):.1f}%", cap=("lower" if better else "higher") + " average error, in megawatts, than a simple guess.",
                   fine=(f"That is the LightGBM model I trained, forecasting hourly electricity demand in each of {len(chosen)} European countries, a day ahead. "
                         f"A simple guess repeats what happened at the same hour a week earlier. Tested on {n_days} days it never saw ({label(first)[4:]} to {label(last)[4:]}), scored once."),
                   side=[["Model: off by", f"{mae['lgbm']:.0f}", "MW per country per hour"], ["Simple guess: off by", f"{mae[base]:.0f}", "MW per country per hour"]]),
         verdict=f"The model beat the simple guess on {win_b} of {n_days} days.",
         plain=[
-            f"Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for {len(chosen)} European countries and tested it honestly. I hid the last {n_days} days, then made the model forecast each one from the night before. It was off by about <b>{mae['lgbm']:.0f} MW</b> per country per hour. A simple guess was off by {mae[base]:.0f}. That is <b>{abs(gain):.0f}% {fewer} misses</b> overall, and a lower percentage error {every}.",
+            f"Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for {len(chosen)} European countries and tested it honestly. I hid the last {n_days} days, then made the model forecast each one from the night before. It was off by about <b>{mae['lgbm']:.0f} MW</b> per country per hour. A simple guess was off by {mae[base]:.0f}. That is <b>{abs(gain):.1f}% {'lower' if better else 'higher'} average error</b>, measured in megawatts, and the percentage error is lower {every}.",
             f"I also compared it with the grid operators' own forecast, which was off by {mae[OP]:.0f} MW. {op_mw} {op_pct}",
             "The operators beat the model in " + (", ".join(op_wins_sane) if op_wins_sane else "none of the checked countries") + ", and the model beat them in " + (", ".join(mo_wins_sane) if mo_wins_sane else "none of the checked countries") +
             f". In {', '.join(flagged_names)} the operator forecast is more than {FLAG_PCT:.0f}% away from measured load every year, so those comparisons are not fair. The operators use weather forecasts and my model does not, so weather is the first thing I would add."+(" I did test that on a separate window, in the Weather tab." if has_w else "")+""],
@@ -125,7 +135,7 @@ def build(res: Path):
                      model_mase=round(float(table.loc["lgbm", "MASE"]), 3), base_mase=round(float(table.loc[base, "MASE"]), 3), op_mase=round(float(table.loc[OP, "MASE"]), 3),
                      win_base=win_b, win_op=win_o, n_days=n_days, flag_pct=FLAG_PCT),
         series=series, days=[dict(iso=str(pd.Timestamp(d).date()), label=label(d)) for d in days], worst=worst,
-        findings=[dict(big=f"{abs(gain):.0f}%", lab=f"{fewer} misses than the simple guess", sub=f"{mae['lgbm']:.0f} MW against {mae[base]:.0f} MW, on {n_days} days never seen. The model had the lower error on {win_b} of them."),
+        findings=[dict(big=f"{abs(gain):.1f}%", lab=f"{'lower' if better else 'higher'} average error in MW than the simple guess", sub=f"{mae['lgbm']:.0f} MW against {mae[base]:.0f} MW, on {n_days} days never seen. The model had the lower error on {win_b} of them."),
                   dict(big=f"{win_o}/{n_days}", lab="days beating the operators' forecast", sub=f"Average error {mae['lgbm']:.0f} MW against {mae[OP]:.0f} MW. " + op_summary),
                   dict(big=f"{band['coverage'] * 100:.0f}%", lab="of actual hours inside the 10% to 90% range", sub="It should be about 80%. " + band_note)],
         timeline=dict(dev=DEV_DAYS, held=int(n_days)),

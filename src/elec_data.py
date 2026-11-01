@@ -2,7 +2,7 @@
 
     python -m src.elec_data
 
-Rule, fixed before any model is run: a country is eligible if its measured load has no gap longer
+Eligibility rule: a country is eligible if its measured load has no gap longer
 than 14 hours and under 0.1% missing hours since 2015, and its operator day-ahead forecast is under
 0.2% missing. Gaps in the operator forecast are left as gaps: those hours are left out of scoring for every model, so all models are compared on identical hours. The 10 eligible countries with the largest average load are used. Small gaps are
 filled by straight-line interpolation and counted. Nothing here touches a model.

@@ -39,7 +39,7 @@ def test_story_is_the_first_view_then_dashboard(tmp_path, monkeypatch):
     assert not at.exception, [e.value for e in at.exception]
     assert at.session_state["view"] == "Dashboard"
     assert len(at.tabs) == 7                            # no map tab without zones30.geojson
-    assert at.selectbox[0].options == ["1", "2"]
+    assert [o.split(":")[0] for o in at.selectbox[0].options] == ["1", "2"]   # labels carry the zone name when the lookup file is present
     assert at.metric[2].value == "held-out"
     at.toggle[0].set_value(True).run()                  # dark mode
     assert not at.exception, [e.value for e in at.exception]
@@ -332,3 +332,19 @@ def test_combined_readme_has_both_domains_and_no_stale_claims(tmp_path):
     assert "demoted" not in make_readme.combine("# NYC ride-hail day-ahead demand forecast\n## Findings\nx\n")
     t = make_readme.combine("# NYC ride-hail day-ahead demand forecast\n## Findings\nx\n")
     assert t.startswith("# Day-ahead forecasting, two domains") and "## A. NYC" in t and "### Findings" in t
+
+
+def test_bias_finding_uses_the_check_file_and_falls_back(tmp_path, monkeypatch):
+    import json
+    from src import make_readme as mr
+    monkeypatch.setattr(mr, "R", tmp_path); monkeypatch.setattr(mr, "ROOT", tmp_path)
+    assert mr.bias_finding() is None                                   # no file, so the README keeps the old wording
+    (tmp_path / "bias_check.json").write_text(json.dumps({
+        "bias_dev": 1.31, "bias_held": -8.01, "mae_held": 31.38, "mean_actual_ratio_held_to_dev": 236.6 / 226.2,
+        "zones_negative": 20, "zones_total": 30, "days_negative": 20, "days_total": 28, "top5_share_of_total_shortfall_pct": 54.0,
+        "worst_zones": [{"zone": "138", "bias": -28.45, "pct_of_zone_demand": -4.5}],
+        "bias_by_hour": {"3": 0.25, "21": -15.65, "8": -12.06},
+        "bias_held_by_model": {"mean_same_hour_4w": -13.59, "lgbm": -8.01, "same_hour_last_week": -5.42, "same_hour_yesterday": -0.68}}))
+    s = mr.bias_finding()
+    assert "+1.3" in s and "4.6% above" in s and "20 of 30 zones" in s and "54%" in s
+    assert "21:00 (-15.7)" in s and "3:00 (+0.2)" in s and "was not tested" in s and "26%" in s

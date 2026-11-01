@@ -69,7 +69,7 @@ def test_wording_follows_the_sign_of_the_result(results):
     t = pd.read_csv(results / "elec_heldout.csv", index_col=0)
     better = t.loc["lgbm", "MAE"] <= t.loc["same_hour_last_week", "MAE"]
     assert o["hero"]["cap"].startswith("lower" if better else "higher")
-    assert ("fewer" if better else "more") in o["findings"][0]["lab"]
+    assert ("lower" if better else "higher") in o["findings"][0]["lab"]
 
 
 def test_weather_numbers_come_from_the_files_and_wording_follows_the_sign(results):
@@ -124,3 +124,19 @@ def test_mind_checks_are_computed_from_the_results_and_fleet_text_is_clean(resul
     assert any(x["title"].startswith("Weather helps") for x in o["mind"])
     blob = json.dumps([o["mind"], o["fleet"]], ensure_ascii=False)
     assert "—" not in blob and "–" not in blob and len(o["fleet"]["columns"]) == 3
+
+
+def test_operator_text_stands_on_megawatts_when_the_two_measures_disagree(results, tmp_path):
+    import shutil
+    r2 = tmp_path / "results"; shutil.copytree(results, r2)
+    pr = pd.read_csv(r2 / "elec_heldout_paired.csv")
+    op = pr["versus"] == "operator_forecast"
+    pr.loc[op & (pr.metric == "MAE (MW)"), ["gain", "ci95_lo", "ci95_hi"]] = [10.0, -40.0, 60.0]
+    pr.loc[op & (pr.metric == "MAPE (%)"), ["gain", "ci95_lo", "ci95_hi"]] = [0.45, 0.11, 0.74]
+    pr.to_csv(r2 / "elec_heldout_paired.csv", index=False)
+    o = make_site_elec.build(r2)
+    o = o[0] if isinstance(o, tuple) else o
+    text = o["plain"][1]
+    assert "cannot say the model is ahead" in text
+    assert "disagree" in text and "stands on megawatts" in text
+    assert "Not clearly different" in o["findings"][1]["sub"]

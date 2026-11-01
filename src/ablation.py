@@ -1,5 +1,5 @@
 """Paired comparison of two LightGBM variants on the same development backtest.
-Applies the rule written in DECISIONS D18 before the result was known.
+Applies the rule in DECISIONS D18.
 
     python -m src.run_models --no-ets --drop-features lag_24,roll24_l24 --tag nolag
     python -m src.ablation

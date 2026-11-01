@@ -43,9 +43,6 @@ def pct(a, b):
     return 100 * (b - a) / b
 
 
-AI_LINE = "Built with AI assistance (Claude) for code and drafting; the decisions log, runs and checks are mine to explain."
-
-
 def elec_section():
     """Domain B text, every number from results/elec_* via make_site_elec.build. Empty if that run has not happened."""
     if not (R / "elec_heldout_predictions.parquet").exists():
@@ -112,14 +109,41 @@ The OPSD pages I read do not state a licence in the page text. I did not verify 
 """
 
 
+def bias_finding():
+    """Sentence on the held-out bias, written from results/bias_check.json (python -m src.bias_check).
+    Returns None if that file does not exist, and the README then says the cause was not investigated."""
+    f = R / "bias_check.json"
+    if not f.exists():
+        return None
+    b = json.loads(f.read_text())
+    names = {}
+    lk = ROOT / "app" / "taxi_zone_lookup.csv"
+    if lk.exists():
+        lkp = pd.read_csv(lk)
+        names = dict(zip(lkp["LocationID"].astype(str), lkp["Zone"]))
+    worst = ", ".join(names.get(w["zone"], f"zone {w['zone']}") for w in b["worst_zones"])
+    rise = 100 * (b["mean_actual_ratio_held_to_dev"] - 1)
+    hrs = b["bias_by_hour"]; lo = min(hrs, key=lambda h: abs(hrs[h])); hi = min(hrs, key=lambda h: hrs[h])
+    bm = b["bias_held_by_model"]
+    order = [("mean_same_hour_4w", "4-week mean"), ("lgbm", "LightGBM"), ("same_hour_last_week", "same hour last week"), ("same_hour_yesterday", "same hour yesterday")]
+    pairs = ", ".join(f"{lab} {bm[k]:.1f}" for k, lab in order if k in bm)
+    mae_note = ""
+    if b.get("mae_held"):
+        mae_note = f" The bias is about {100 * abs(b['bias_held']) / b['mae_held']:.0f}% of LightGBM's MAE, so most of the miss is not bias."
+    return (f" Development days were {b['bias_dev']:+.1f}. Mean demand in the held-out weeks ran {rise:.1f}% above the development average. "
+            f"The shortfall was spread out ({b['zones_negative']} of {b['zones_total']} zones and {b['days_negative']} of {b['days_total']} days were negative), "
+            f"but the 5 worst zones carry {b['top5_share_of_total_shortfall_pct']:.0f}% of it ({worst}). By hour it is largest at {hi}:00 ({hrs[hi]:.1f}) and smallest at {lo}:00 ({hrs[lo]:+.1f}). "
+            f"Held-out bias by model: {pairs}. That fits demand running above the recent history, but why (season, events, weather) was not tested.{mae_note}")
+
+
 def combine(taxi):
     """Two domains in one README: Domain A headings demoted one level, Domain B appended."""
     a = re.sub(r"^## ", "### ", taxi, flags=re.M)
     a = a.replace("# NYC ride-hail day-ahead demand forecast", "## A. NYC ride-hail day-ahead demand forecast", 1)
     head = ("# Day-ahead forecasting, two domains\n\nTwo forecasting projects built with the same discipline: forecasts made from the night before, "
             "a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. "
-            "Decisions were written before code (`DECISIONS.md` and `docs/decisions/`).\n\n")
-    return head + a.rstrip() + "\n\n" + elec_section() + "\n" + AI_LINE + "\n"
+            "Decisions are logged in `DECISIONS.md` and `docs/decisions/`.\n\n")
+    return head + a.rstrip() + "\n\n" + elec_section() + "\n"
 
 
 def main():
@@ -149,14 +173,14 @@ def main():
          f"- Averaging LightGBM with the best baseline gave MAE {held.loc[combo, 'MAE']:.2f} against "
          f"{held.loc['lgbm', 'MAE']:.2f} for LightGBM alone, so the combination did not help."]
     if nolag is not None:
-        f.append(f"- Ablation (pre-registered in DECISIONS D18): dropping the two short-lag features moved development MASE "
+        f.append(f"- Ablation (rule in DECISIONS D18): dropping the two short-lag features moved development MASE "
                  f"from {dev.loc['lgbm', 'MASE']:.3f} to {nolag.loc['lgbm', 'MASE']:.3f}.")
     f.append(f"- The 10% to 90% interval covered {hc.loc['all', 'coverage_rounded'] * 100:.0f}% of held-out hours after rounding edges "
              f"outward to whole trips (raw {hc.loc['all', 'coverage_raw'] * 100:.0f}%). In quiet zones the raw interval covers "
              f"{hc.loc['quiet', 'coverage_raw'] * 100:.0f}% because counts are integers, so rounded coverage there "
              f"({hc.loc['quiet', 'coverage_rounded'] * 100:.0f}%) mostly reflects zero-heavy hours.")
     f.append(f"- Held-out bias (forecast minus actual, trips per zone-hour) was negative for {len(bias_neg)} of {len(held)} "
-             f"models; LightGBM {held.loc['lgbm', 'bias']:.1f}. Demand ran above what the history implied; the cause was not investigated.")
+             f"models; LightGBM {held.loc['lgbm', 'bias']:.1f}." + (bias_finding() or " Demand ran above what the history implied; the cause was not investigated."))
 
     reasons = pd.read_csv(ROOT / "docs" / "day_reasons.csv").set_index("date")
     wd = pd.read_csv(R / "analysis" / "worst_days.csv")
@@ -219,7 +243,7 @@ Development result table (rolling backtest on every day before the held-out week
 3. Four baselines, exponential smoothing, one global Poisson LightGBM (lag 24, lag 168, rolling means, hour, weekday, holiday, zone), an average of LightGBM and the best baseline, and 10%/90% quantile LightGBM.
 4. MAE, RMSE, bias and MASE (scaled by lag-168 seasonal naive). No MAPE.
 5. The leak test recomputes features from raw history and is shown to fail on three planted leaks (`tests/test_leakage.py`).
-6. Decisions were written before code: see `DECISIONS.md`.
+6. Decisions are logged in `DECISIONS.md` and `docs/decisions/`.
 
 ## Reproduce
 

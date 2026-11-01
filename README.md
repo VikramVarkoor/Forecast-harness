@@ -1,6 +1,6 @@
 # Day-ahead forecasting, two domains
 
-Two forecasting projects built with the same discipline: forecasts made from the night before, a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. Decisions were written before code (`DECISIONS*.md`).
+Two forecasting projects built with the same discipline: forecasts made from the night before, a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. Decisions are logged in `DECISIONS.md` and `docs/decisions/`.
 
 ## A. NYC ride-hail day-ahead demand forecast
 
@@ -14,9 +14,9 @@ Every number below is written by `python -m src.make_readme` from files in `resu
 - **Development, rolling backtest:** LightGBM MAE 34.43 against 38.39 for the best baseline (mean of same hour, last 4 weeks), 10.3% lower. MASE 0.784 against 0.853. Paired daily gain 3.96 trips per zone-hour (95% interval 2.10 to 6.49), better on 70% of 281 days.
 - Exponential smoothing ranks 5 of 7 on held-out MASE (1.234), behind the 4-week mean (0.954). It did not earn its place.
 - Averaging LightGBM with the best baseline gave MAE 33.18 against 31.38 for LightGBM alone, so the combination did not help.
-- Ablation (pre-registered in DECISIONS D18): dropping the two short-lag features moved development MASE from 0.784 to 0.860.
+- Ablation (rule in DECISIONS D18): dropping the two short-lag features moved development MASE from 0.784 to 0.860.
 - The 10% to 90% interval covered 82% of held-out hours after rounding edges outward to whole trips (raw 75%). In quiet zones the raw interval covers 59% because counts are integers, so rounded coverage there (96%) mostly reflects zero-heavy hours.
-- Held-out bias (forecast minus actual, trips per zone-hour) was negative for 5 of 7 models; LightGBM -8.0. Demand ran above what the history implied; the cause was not investigated.
+- Held-out bias (forecast minus actual, trips per zone-hour) was negative for 5 of 7 models; LightGBM -8.0. Development days were +1.3. Mean demand in the held-out weeks ran 4.6% above the development average. The shortfall was spread out (20 of 30 zones and 20 of 28 days were negative), but the 5 worst zones carry 54% of it (LaGuardia Airport, TriBeCa/Civic Center, Times Sq/Theatre District, West Chelsea/Hudson Yards, Midtown Center). By hour it is largest at 21:00 (-15.7) and smallest at 3:00 (+0.2). Held-out bias by model: 4-week mean -13.6, LightGBM -8.0, same hour last week -5.4, same hour yesterday -0.7. That fits demand running above the recent history, but why (season, events, weather) was not tested. The bias is about 26% of LightGBM's MAE, so most of the miss is not bias.
 
 Held-out result table (lower is better; MASE under 1 beats the seasonal naive of lag 168):
 
@@ -83,7 +83,7 @@ Development result table (rolling backtest on every day before the held-out week
 3. Four baselines, exponential smoothing, one global Poisson LightGBM (lag 24, lag 168, rolling means, hour, weekday, holiday, zone), an average of LightGBM and the best baseline, and 10%/90% quantile LightGBM.
 4. MAE, RMSE, bias and MASE (scaled by lag-168 seasonal naive). No MAPE.
 5. The leak test recomputes features from raw history and is shown to fail on three planted leaks (`tests/test_leakage.py`).
-6. Decisions were written before code: see `DECISIONS.md`.
+6. Decisions are logged in `DECISIONS.md` and `docs/decisions/`.
 
 ### Reproduce
 
@@ -111,8 +111,8 @@ Every number in this section is computed from `results/elec_*` files by `src/mak
 ### Findings
 
 - The model beat the simple guess on 27 of 28 days.
-- Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for 10 European countries and tested it honestly. I hid the last 28 days, then made the model forecast each one from the night before. It was off by about 423 MW per country per hour. A simple guess was off by 759. That is 44% fewer misses overall, and a lower percentage error in every one of the 10 countries.
-- I also compared it with the grid operators' own forecast, which was off by 468 MW. In megawatts the difference is small and the 95% range runs from -20 to +94 MW a day, so I cannot say the model is ahead. In percent the model was 0.45 points better, with a 95% range of 0.11 to 0.74.
+- Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for 10 European countries and tested it honestly. I hid the last 28 days, then made the model forecast each one from the night before. It was off by about 423 MW per country per hour. A simple guess was off by 759. That is 44.3% lower average error, measured in megawatts, and the percentage error is lower in every one of the 10 countries.
+- I also compared it with the grid operators' own forecast, which was off by 468 MW. In megawatts the difference is small and the 95% range runs from -20 to +94 MW a day, so I cannot say the model is ahead. In percent the model was 0.45 points better (95% range 0.11 to 0.74). Megawatts count the big countries most, percent counts every country the same. The two measures disagree, so my conclusion stands on megawatts, the measure this page leads with: not clearly different.
 - The operators beat the model in Italy, Spain, Finland, and the model beat them in Germany, France, Poland, Belgium. In Netherlands, Switzerland, Austria the operator forecast is more than 4% away from measured load every year, so those comparisons are not fair. The operators use weather forecasts and my model does not, so weather is the first thing I would add. I did test that on a separate window (see Weather test below).
 - 75% of actual hours fell inside the 10% to 90% range. It should be about 80%. The range is a little too narrow, so treat it as optimistic.
 
@@ -193,3 +193,4 @@ python -m src.make_site           # builds the static site, including elec.html
 Hourly load and operator forecasts from Open Power System Data (originally the ENTSO-E Transparency Platform), 2015-01-02 to 2020-09-30. Cite as: Open Power System Data. 2020. Data Package Time series. Version 2020-10-06. https://doi.org/10.25832/time_series/2020-10-06.
 Weather: Open Power System Data. 2020. Data Package Weather Data. Version 2020-09-16. https://doi.org/10.25832/weather_data/2020-09-16.
 The OPSD pages I read do not state a licence in the page text. I did not verify one, so check the data package metadata before redistributing derived data. Raw data is not in this repository.
+
