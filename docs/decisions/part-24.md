@@ -53,3 +53,7 @@
 
 ## D99: Two-pixel horizontal scroll removed
 - The per-country figure line used a no-wrap rule that pushed the page 2 px wider than the window at about 1000 to 1200 px. It now wraps.
+
+## D100: Gaps under 0.1 points are called level
+- A country where the model and the operators are within 0.1 percentage points of percentage error is now "level" in the written paragraph and on the tile's second line, not a win for either. France (0.02 points) is one. Poland (0.79 points) is a real gap and stays a win. The 0.1 cutoff is a choice, set as `LEVEL_PTS` in `make_site_elec.py`, and the page states it. The "keeps up with the operators" check counts level countries as keeping up.
+- Read-through of the other pages for development and held-out labels: the taxi best-and-worst-days table already has a Data column, the README's worst days list is titled "worst development days", and the Storm days tab dropdown now names the period. Nothing else needed relabelling.

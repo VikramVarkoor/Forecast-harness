@@ -117,7 +117,7 @@
     D.countries.forEach(function (c) {
       var q = POS[c.code] || [extra++, 4], t1 = el("div", "tile"); t1.style.gridColumn = String(q[0] + 1); t1.style.gridRow = String(q[1] + 1);
       t1.appendChild(el("b", null, c.code)); t1.appendChild(el("span", "tv", ""));
-      t1.appendChild(el("span", "tv tv-all", c.flagged ? "" : D.days.length + " days: " + (c.mape_model < c.mape_op ? "model" : "operators") + " by " + Math.abs(c.mape_model - c.mape_op).toFixed(2) + " pts")); tm.appendChild(t1); tiles[c.code] = t1;
+      t1.appendChild(el("span", "tv tv-all", c.flagged ? "" : D.days.length + " days: " + (c.level ? "level" : (c.mape_model < c.mape_op ? "model by " : "operators by ") + Math.abs(c.mape_model - c.mape_op).toFixed(2) + " pts"))); tm.appendChild(t1); tiles[c.code] = t1;
     });
     tm.setAttribute("role", "group"); tm.setAttribute("aria-label", "Rough map of the ten countries. Each tile says whether the model or the operators were closer on the chosen day.");
     main.appendChild(tm); main.appendChild(el("p", "caption", "Tile colour and the first line are the day picked on the slider: cyan means the model was closer, amber the operators. The second line is the average over all " + D.days.length + " days, the same comparison the written summary uses. Dashed tile: the operator forecast is not like for like, so no winner is called."));

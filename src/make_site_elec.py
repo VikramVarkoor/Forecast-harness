@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NAMES = dict(DE="Germany", FR="France", IT="Italy", ES="Spain", PL="Poland", NL="Netherlands", BE="Belgium", FI="Finland",
              AT="Austria", CH="Switzerland", GR="Greece", HU="Hungary", DK="Denmark", SK="Slovakia", HR="Croatia", SE="Sweden", NO="Norway")
 LINKS = [("Portfolio", "https://vikramvarkoor.vercel.app"), ("GitHub", "https://github.com/VikramVarkoor"), ("LinkedIn", "https://linkedin.com/in/vikram-varkoor")]
+LEVEL_PTS = 0.1   # a country gap smaller than this many percentage points is called level, not a win
 FLAG_PCT = 4.0   # operator forecast flagged if its mean error vs measured load is above this in every year of the data
 DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -68,12 +69,14 @@ def build(res: Path):
         countries.append(dict(code=c, name=NAMES.get(c, c), mean_load=round(float(load[c])), flagged=bool(flagged[c]),
                               mape_model=round(float(c_mape.loc[c, "lgbm"]), 2), mape_base=round(float(c_mape.loc[c, base]), 2), mape_op=round(float(c_mape.loc[c, OP]), 2),
                               mae_model=round(float(c_mae.loc[c, "lgbm"])), mae_base=round(float(c_mae.loc[c, base])), mae_op=round(float(c_mae.loc[c, OP])),
+                              level=bool(abs(float(c_mape.loc[c, "lgbm"]) - float(c_mape.loc[c, OP])) < LEVEL_PTS),
                               op_year_err=round(float(np.mean(list(qc[c].values()))), 1)))
     n_better = sum(c["mape_model"] < c["mape_base"] for c in countries)
     every = f"in every one of the {len(countries)} countries" if n_better == len(countries) else (f"in {n_better} of the {len(countries)} countries" if n_better else f"in none of the {len(countries)} countries")
     sane = [c for c in countries if not c["flagged"]]
-    op_wins_sane = [c["name"] for c in sane if c["mape_op"] < c["mape_model"]]
-    mo_wins_sane = [c["name"] for c in sane if c["mape_model"] < c["mape_op"]]
+    op_wins_sane = [c["name"] for c in sane if c["mape_model"] - c["mape_op"] >= LEVEL_PTS]
+    mo_wins_sane = [c["name"] for c in sane if c["mape_op"] - c["mape_model"] >= LEVEL_PTS]
+    level_sane = [c["name"] for c in sane if abs(c["mape_model"] - c["mape_op"]) < LEVEL_PTS]
     flagged_names = [c["name"] for c in countries if c["flagged"]]
 
     p_mae = pr[(pr.versus == OP) & (pr.metric == "MAE (MW)")].iloc[0]; p_map = pr[(pr.versus == OP) & (pr.metric == "MAPE (%)")].iloc[0]
@@ -127,6 +130,7 @@ def build(res: Path):
             f"Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for {len(chosen)} European countries and tested it honestly. I hid the last {n_days} days, then made the model forecast each one from the night before. It was off by about <b>{mae['lgbm']:.0f} MW</b> per country per hour. A simple guess was off by {mae[base]:.0f}. That is <b>{abs(gain):.1f}% {'lower' if better else 'higher'} average error</b>, measured in megawatts, and the percentage error is lower {every}.",
             f"I also compared it with the grid operators' own forecast, which was off by {mae[OP]:.0f} MW. {op_mw} {op_pct}",
             "The operators beat the model in " + (", ".join(op_wins_sane) if op_wins_sane else "none of the checked countries") + ", and the model beat them in " + (", ".join(mo_wins_sane) if mo_wins_sane else "none of the checked countries") +
+            (f". It was level, within {LEVEL_PTS:g} percentage points, in {', '.join(level_sane)}" if level_sane else "") +
             f". In {', '.join(flagged_names)} the operator forecast is more than {FLAG_PCT:.0f}% away from measured load every year, so those comparisons are not fair. The operators use weather forecasts and my model does not, so weather is the first thing I would add."+(" I did test that on a separate window, in the Weather tab." if has_w else "")+""],
         daily=[dict(label=label(d), model=round(float(d_m[d])), base=round(float(d_b[d])), op=round(float(d_o[d]))) for d in d_m.index],
         countries=countries,
@@ -211,9 +215,9 @@ def mind_checks(pred, countries, base, mae, n_days, win_b, band, wx):
     out.append(("Holds" if win_b * 2 >= n_days else "Fails", "It wins on most days, not a few lucky ones",
                 f"It beat the simple guess on {win_b} of {n_days} held-out days."))
     sane = [c for c in countries if not c["flagged"]]
-    lvl = sum(c["mape_model"] <= c["mape_op"] for c in sane)
+    lvl = sum(c["mape_model"] <= c["mape_op"] + LEVEL_PTS for c in sane)
     out.append(("Holds" if sane and lvl * 2 >= len(sane) else "Fails", "It keeps up with the operators where the comparison is fair",
-                f"It had the lower or equal percentage error than the operators in {lvl} of {len(sane)} countries whose operator series looks sound. The operators have weather forecasts and the model does not."))
+                f"It had a lower percentage error than the operators, or was level within {LEVEL_PTS:g} points, in {lvl} of {len(sane)} countries whose operator series looks sound. The operators have weather forecasts and the model does not."))
     cov = band["coverage"]
     off = abs(cov - 0.8)
     out.append(("Holds" if off <= 0.03 else ("Partly" if off <= 0.10 else "Fails"), "The 10% to 90% range can be trusted",

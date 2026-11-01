@@ -155,3 +155,21 @@ def test_interval_check_says_partly_when_a_little_off(results):
     status = mind["The 10% to 90% range can be trusted"]["status"]
     off = abs(cov - 0.8)
     assert status == ("Holds" if off <= 0.03 else ("Partly" if off <= 0.10 else "Fails"))
+
+
+def test_a_tiny_country_gap_is_called_level_not_a_win(results, tmp_path):
+    import shutil
+    r2 = tmp_path / "results"; shutil.copytree(results, r2)
+    cc = pd.read_csv(r2 / "elec_heldout_by_country.csv")
+    fr = cc["country"] == "FR"
+    mo = cc.loc[fr & (cc["model"] == "lgbm"), "MAPE_pct"].iloc[0]
+    cc.loc[fr & (cc["model"] == "operator_forecast"), "MAPE_pct"] = mo + 0.02
+    cc.to_csv(r2 / "elec_heldout_by_country.csv", index=False)
+    o = make_site_elec.build(r2)
+    o = o[0] if isinstance(o, tuple) else o
+    text = o["plain"][2]
+    import re
+    m = re.search(r"level, within 0\.1 percentage points, in ([^.]*)\.", text)
+    assert m and "France" in m.group(1)
+    assert "France" not in text.split("It was level")[0]
+    assert [c["level"] for c in o["countries"] if c["code"] == "FR"] == [True]
