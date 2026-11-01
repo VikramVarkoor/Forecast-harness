@@ -193,5 +193,3 @@ python -m src.make_site           # builds the static site, including elec.html
 Hourly load and operator forecasts from Open Power System Data (originally the ENTSO-E Transparency Platform), 2015-01-02 to 2020-09-30. Cite as: Open Power System Data. 2020. Data Package Time series. Version 2020-10-06. https://doi.org/10.25832/time_series/2020-10-06.
 Weather: Open Power System Data. 2020. Data Package Weather Data. Version 2020-09-16. https://doi.org/10.25832/weather_data/2020-09-16.
 The OPSD pages I read do not state a licence in the page text. I did not verify one, so check the data package metadata before redistributing derived data. Raw data is not in this repository.
-
-Built with AI assistance (Claude) for code and drafting; the decisions log, runs and checks are mine to explain.
