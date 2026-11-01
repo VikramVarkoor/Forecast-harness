@@ -54,7 +54,7 @@ Development result table (rolling backtest on every day before the held-out week
 
 - The held-out set is 28 days in one month. The paired interval uses only 4 weekly blocks, so treat it as crude.
 - The held-out weeks were scored 1 time(s) (`results/heldout_run.json`). Nothing was tuned on them.
-- Only 30 zones are modelled. Results say nothing about the other zones.
+- Only 30 zones are modelled. Results say nothing about the other zones. Zone 265 is the TLC's catch-all for trips outside the city, not a neighbourhood.
 - The data covers one year, so each holiday appears once. Holiday handling is a flag, not a learned effect.
 - Shock days dominate the error. The ten worst development days:
 
@@ -113,7 +113,7 @@ Every number in this section is computed from `results/elec_*` files by `src/mak
 - The model beat the simple guess on 27 of 28 days.
 - Grid operators publish a day-ahead demand forecast that traders and plant schedulers lean on. I built the same kind of forecast for 10 European countries and tested it honestly. I hid the last 28 days, then made the model forecast each one from the night before. It was off by about 423 MW per country per hour. A simple guess was off by 759. That is 44.3% lower average error, measured in megawatts, and the percentage error is lower in every one of the 10 countries.
 - I also compared it with the grid operators' own forecast, which was off by 468 MW. In megawatts the difference is small and the 95% range runs from -20 to +94 MW a day, so I cannot say the model is ahead. In percent the model was 0.45 points better (95% range 0.11 to 0.74). Megawatts count the big countries most, percent counts every country the same. The two measures disagree, so my conclusion stands on megawatts, the measure this page leads with: not clearly different.
-- The operators beat the model in Italy, Spain, Finland, and the model beat them in Germany, France, Poland, Belgium. In Netherlands, Switzerland, Austria the operator forecast is more than 4% away from measured load every year, so those comparisons are not fair. The operators use weather forecasts and my model does not, so weather is the first thing I would add. I did test that on a separate window (see Weather test below).
+- The operators beat the model in Italy, Spain, Finland, and the model beat them in Germany, Poland, Belgium. It was level, within 0.1 percentage points, in France. In Netherlands, Switzerland, Austria the operator forecast is more than 4% away from measured load every year, so those comparisons are not fair. The operators use weather forecasts and my model does not, so weather is the first thing I would add. I did test that on a separate window (see Weather test below).
 - 75% of actual hours fell inside the 10% to 90% range. It should be about 80%. The range is a little too narrow, so treat it as optimistic.
 
 Held-out (28 days, scored once; lower is better):

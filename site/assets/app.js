@@ -96,15 +96,16 @@
   function followScroll(on) { if (on && !scrollOn) { addEventListener("scroll", onScroll, { passive: true }); onScroll(); } else if (!on && scrollOn) removeEventListener("scroll", onScroll); scrollOn = on; }
   function meter(text) {
     var box = el("div", "meter"); box.setAttribute("role", "img"); box.setAttribute("aria-label", text);
+    box.appendChild(el("span", "sr", text));                  /* the real number, as text, for readers, copy and search */
     var inn = el("div", "meter-in"); inn.setAttribute("aria-hidden", "true");
     text.split("").forEach(function (c, i) {
-      if (c === ".") inn.appendChild(el("span", "dot", "."));
+      if (c === ".") { var dt = el("span", "dot"); dt.setAttribute("data-c", "."); inn.appendChild(dt); }
       else if (/\d/.test(c)) {
         var d = el("span", "d"), s = el("i", "strip");
         s.style.setProperty("--end", String(+c + 10)); s.style.setProperty("--i", String(i));
-        for (var n = 0; n < 20; n++) s.appendChild(el("b", null, String(n % 10)));
+        for (var n = 0; n < 20; n++) { var bb = el("b"); bb.setAttribute("data-n", String(n % 10)); s.appendChild(bb); }   /* digits are drawn by CSS, so the reel adds no stray text */
         d.appendChild(s); inn.appendChild(d);
-      } else inn.appendChild(el("span", null, c));
+      } else { var ch = el("span", "ch"); ch.setAttribute("data-c", c); inn.appendChild(ch); }
     });
     box.appendChild(inn); return box;
   }

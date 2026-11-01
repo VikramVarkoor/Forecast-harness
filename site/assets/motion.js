@@ -68,9 +68,12 @@
     root.querySelectorAll(".big").forEach(function (n) {
       var m = /^(-?\d+(?:\.\d+)?)(.*)$/.exec(n.textContent); if (!m) return;
       var end = parseFloat(m[1]), dec = (m[1].split(".")[1] || "").length, suffix = m[2], t0 = performance.now(), D = 1100;
+      /* The element keeps its real text the whole time; the counting number is drawn on top by CSS, so anything reading the page sees the final value. */
+      n.style.setProperty("--cu-color", getComputedStyle(n).color); n.classList.add("cu");
       (function step(now) {
         var k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
-        n.textContent = (end * e).toFixed(dec) + suffix; if (k < 1) requestAnimationFrame(step);
+        if (k < 1) { n.setAttribute("data-now", (end * e).toFixed(dec) + suffix); requestAnimationFrame(step); }
+        else { n.classList.remove("cu"); n.removeAttribute("data-now"); n.style.removeProperty("--cu-color"); }
       })(t0);
     });
   }

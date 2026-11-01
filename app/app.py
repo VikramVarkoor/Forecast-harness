@@ -249,8 +249,16 @@ def zone_names(path: str = str(LOOKUP)) -> dict:
     p = Path(path)
     if not p.exists():
         return {}
-    z = pd.read_csv(p)
-    return {int(r.LocationID): f"{r.Borough}, {r.Zone}" for r in z.itertuples()}
+    z = pd.read_csv(p, keep_default_na=False)                      # the lookup file has a borough called "N/A"; read it as text, not as a missing value
+    return {int(r.LocationID): zone_label(r.Borough, r.Zone) for r in z.itertuples()}
+
+
+def zone_label(borough, zone) -> str:
+    """'Borough, Zone'. The TLC catch-all rows have no real borough, so they are named on their own."""
+    b, zn = str(borough).strip(), str(zone).strip()
+    if zn.lower() == "outside of nyc":
+        return "Outside NYC (catch-all)"
+    return zn if b.lower() in ("", "nan", "n/a", "unknown") else f"{b}, {zn}"
 
 
 @st.cache_data

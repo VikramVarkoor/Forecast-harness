@@ -405,3 +405,13 @@ def test_exponential_smoothing_and_blend_get_separate_cards():
     ets = [c for c in cards if c[1].startswith("A classic")][0]; blend = [c for c in cards if c[1].startswith("Blending")][0]
     assert "blend" not in ets[2].lower() and "exponential" not in blend[2].lower()
     assert blend[0] == "6% worse"
+
+
+def test_zone_labels_never_say_nan_and_name_the_catch_all(tmp_path):
+    import app.app as a
+    lk = tmp_path / "lookup.csv"
+    lk.write_text("LocationID,Borough,Zone,service_zone\n1,EWR,Newark Airport,EWR\n7,Queens,Astoria,Boro Zone\n264,Unknown,NV,N/A\n265,N/A,Outside of NYC,N/A\n")
+    names = a.zone_names.__wrapped__(str(lk))
+    assert names[1] == "EWR, Newark Airport" and names[7] == "Queens, Astoria"
+    assert names[265] == "Outside NYC (catch-all)" and "nan" not in names[265].lower()
+    assert names[264] == "NV" and "nan" not in names[264].lower()

@@ -227,6 +227,7 @@ def main():
                       pd.read_csv(R / "heldout.csv", index_col=0).loc[f"{base}|{t}", "MAE"],
                       "LightGBM MAE": pd.read_csv(R / "heldout.csv", index_col=0).loc[f"lgbm|{t}", "MAE"]})
     ntr = int(pred["zone"].nunique())
+    catch = " Zone 265 is the TLC's catch-all for trips outside the city, not a neighbourhood." if 265 in set(pred["zone"].astype(int)) else ""
 
     text = f"""# NYC ride-hail day-ahead demand forecast
 
@@ -254,7 +255,7 @@ Development result table (rolling backtest on every day before the held-out week
 
 - The held-out set is 28 days in one month. The paired interval uses only 4 weekly blocks, so treat it as crude.
 - The held-out weeks were scored {len(runs)} time(s) (`results/heldout_run.json`). Nothing was tuned on them.
-- Only {ntr} zones are modelled. Results say nothing about the other zones.
+- Only {ntr} zones are modelled. Results say nothing about the other zones.{catch}
 - The data covers one year, so each holiday appears once. Holiday handling is a flag, not a learned effect.
 - Shock days dominate the error. The ten worst development days:
 

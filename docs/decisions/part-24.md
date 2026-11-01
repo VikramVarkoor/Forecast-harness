@@ -57,3 +57,11 @@
 ## D100: Gaps under 0.1 points are called level
 - A country where the model and the operators are within 0.1 percentage points of percentage error is now "level" in the written paragraph and on the tile's second line, not a win for either. France (0.02 points) is one. Poland (0.79 points) is a real gap and stays a win. The 0.1 cutoff is a choice, set as `LEVEL_PTS` in `make_site_elec.py`, and the page states it. The "keeps up with the operators" check counts level countries as keeping up.
 - Read-through of the other pages for development and held-out labels: the taxi best-and-worst-days table already has a Data column, the README's worst days list is titled "worst development days", and the Storm days tab dropdown now names the period. Nothing else needed relabelling.
+
+## D101: Zone 265 label and note
+- The TLC lookup file has a borough called "N/A", which was read as a missing value and printed as "nan". The lookup is now read as text, and zone 265 reads "Outside NYC (catch-all)". Zones with no real borough show just their name.
+- The Forecast tab shows one line when zone 265 is selected, and the README's limits list says it, because 265 is the city's catch-all for trips outside New York, not a neighbourhood.
+
+## D102: Counting numbers keep their real text
+- The hero meter, the electricity hero number and the count-up card numbers used to overwrite their own text while counting, so a screenshot, a scraper or a screen reader could catch a half-counted value (and the taxi meter's stacked digit reel read as "0123456789..."). Now the element always holds the final value as text and the moving figure is drawn over it by CSS. The meter's reel digits are drawn by CSS too, so they add no stray text.
+- Checked in a browser: the settled pixels of the hero and card are identical before and after, mid-count the text already reads the final value, and no tab of the taxi page scrolls sideways at 360, 390 or 1200 px wide.

@@ -83,8 +83,11 @@
   }
   function bigNumber(text) {
     var n = el("div", "bignum"); n.setAttribute("role", "img"); n.setAttribute("aria-label", text); var v = parseFloat(text), suffix = text.replace(/[0-9.]/g, "");
-    n.textContent = text;
-    if (!reduced && isFinite(v)) { var t0 = performance.now(), dur = 1400; (function tick(now) { var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); n.textContent = (v * e).toFixed(1) + suffix; if (k < 1) requestAnimationFrame(tick); else n.textContent = text; })(t0); }
+    n.textContent = text;     /* the real number stays in the page; the counting number is drawn on top by CSS */
+    if (!reduced && isFinite(v)) {
+      var t0 = performance.now(), dur = 1400; n.classList.add("cu");
+      (function tick(now) { var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); if (k < 1) { n.setAttribute("data-now", (v * e).toFixed(1) + suffix); requestAnimationFrame(tick); } else { n.classList.remove("cu"); n.removeAttribute("data-now"); } })(t0);
+    }
     return n;
   }
   /* A transmission line across the top of the banner: pylons, two wires, and pulses of load that run along them for as long as the page is open. */

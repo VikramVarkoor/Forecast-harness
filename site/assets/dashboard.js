@@ -277,6 +277,7 @@
     var head = el("div", "controls");
     head.appendChild(select("Taxi zone", D.zones.map(function (z) { return { value: z.id, label: z.id + ": " + z.name }; }), zid, function (v) { ui.zone = +v; ui.day = null; if (H.motion) H.motion.ping(); renderTab(); }));
     box.appendChild(head); box.appendChild(ftitle);
+    if (zid === 265) box.appendChild(note("Zone 265 is the city's catch-all for trips outside New York City, not a neighbourhood."));
     box.appendChild(note("How to read this: black is what actually happened. Blue is the model's forecast, made the night before. The gray dashed line is the simple rule of thumb. The yellow band is the range the model expected most hours to land in. The faint shading behind it is a rough guide to night and day, not real sunrise times."));
     box.appendChild(tools);
     box.appendChild(el("p", "strip-key", "Every day in this zone. Blue ticks: the model won. Orange: the simple rule won. Yellow underline: held-out days. Click one, or use the arrow keys on the slider."));
