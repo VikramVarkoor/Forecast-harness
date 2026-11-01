@@ -37,3 +37,7 @@
 
 ## D94: README lists the file behind each headline number
 - A "Where the numbers come from" section is generated from the results folder and lists only files that exist. It also states that `app/app.py` is the original Streamlit dashboard and that the static site generator reuses its data code, which is why it stays.
+
+## D95: Tests no longer overwrite the real link-preview picture
+- `python -m src.make_site_elec` always wrote `site/assets/og-elec.png`, including when a test ran it on made-up data, so a test run replaced the real picture with one showing the test's numbers. A commit made right after the tests had picked that up.
+- The picture path is now an option (`--og`), the test points it at a temporary folder, and the test checks that the real file is unchanged.

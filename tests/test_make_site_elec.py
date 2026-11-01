@@ -59,8 +59,12 @@ def test_odd_operator_series_is_flagged_and_text_is_clean(results):
 
 
 def test_writes_json(results, tmp_path):
-    sys.argv = ["x", "--results", str(results), "--out", str(tmp_path)]
+    real_og = make_site_elec.ROOT / "site" / "assets" / "og-elec.png"
+    before = real_og.read_bytes() if real_og.exists() else None
+    sys.argv = ["x", "--results", str(results), "--out", str(tmp_path), "--og", str(tmp_path / "og.png")]
     make_site_elec.main()
+    assert (tmp_path / "og.png").exists()
+    assert (real_og.read_bytes() if real_og.exists() else None) == before     # a test run must never overwrite the real share picture
     assert json.loads((tmp_path / "elec.json").read_text())["verdict"].startswith("The model beat the simple guess on")
 
 

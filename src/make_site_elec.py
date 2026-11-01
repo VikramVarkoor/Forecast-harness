@@ -303,6 +303,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", default=str(ROOT / "results"))
     ap.add_argument("--out", default=str(ROOT / "site" / "data" / "elec"))
+    ap.add_argument("--og", default=str(ROOT / "site" / "assets" / "og-elec.png"), help="where to write the link-preview picture")
     a = ap.parse_args()
     o = build(Path(a.results))
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
@@ -310,7 +311,7 @@ def main():
     try:
         from src import og_elec
         s0 = o["series"][o["countries"][0]["code"]]
-        og_elec.og_image(ROOT / "site" / "assets" / "og-elec.png", o["hero"], (s0["y"][-1], s0["model"][-1]))
+        og_elec.og_image(Path(a.og), o["hero"], (s0["y"][-1], s0["model"][-1]))
     except Exception as e:      # the preview picture is a nicety; never block the page data
         print("preview image not written:", e)
     print(f"wrote {out / 'elec.json'}")
