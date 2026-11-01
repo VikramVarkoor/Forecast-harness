@@ -144,6 +144,7 @@ a.news > * {display: block;}
 .chip {flex: none; min-width: 6.2rem; text-align: center; font-weight: 800; font-size: .85rem; border: 2px solid #111; border-radius: 999px; padding: .15rem .6rem;}
 .chip.holds {background: var(--taxi); color: #111;}
 .chip.fails {background: var(--warn); color: #fff;}
+.chip.partly {background: transparent; color: var(--text); border: 2px solid var(--warn);}
 .chip.untested {background: transparent; color: var(--text); border: 2px dashed var(--text);}
 
 /* test timeline and glossary */
@@ -461,7 +462,7 @@ html[data-domain="elec"] main {padding-top: 1.6rem;}
 .eurow {display: grid; grid-template-columns: 7.5rem 1fr 17rem; gap: .8rem; align-items: center; padding: .25rem 0; border-bottom: 1px solid var(--grid);}
 .eu-name {font-weight: 700;}
 .eurow svg {width: 100%; height: 54px; display: block;}
-.eu-fig {font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: pre;}
+.eu-fig {font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; white-space: pre-wrap; overflow-wrap: anywhere; min-width: 0;}
 @media (max-width: 700px) {.eurow {grid-template-columns: 1fr; gap: .1rem;} .eu-fig {white-space: normal;}}
 html[data-domain="elec"] {--t-model: #2F7FD8; --t-actual: #111111;}
 html[data-domain="elec"][data-theme="dark"] {--t-model: #4CD7F6; --t-actual: #F2F6FF;}
@@ -475,6 +476,7 @@ html[data-domain="elec"][data-theme="dark"] {--t-model: #4CD7F6; --t-actual: #F2
 .tile {border: 2px solid var(--grid); border-radius: 10px; padding: .45rem .5rem; min-height: 4rem; transition: background-color .35s, border-color .35s; display: flex; flex-direction: column; gap: .1rem;}
 .tile b {font-family: var(--serif); font-size: 1.15rem;}
 .tile .tv {font-size: .8rem; line-height: 1.15; color: var(--muted);}
+.tile .tv-all {font-size: .72rem; opacity: .85;}
 .tile.win {background: color-mix(in srgb, #4CD7F6 30%, transparent); border-color: #4CD7F6;}
 .tile.lose {background: color-mix(in srgb, #F2A33A 30%, transparent); border-color: #F2A33A;}
 .tile.flag {border-style: dashed;}

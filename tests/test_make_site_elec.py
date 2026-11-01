@@ -144,3 +144,14 @@ def test_operator_text_stands_on_megawatts_when_the_two_measures_disagree(result
     assert "cannot say the model is ahead" in text
     assert "disagree" in text and "stands on megawatts" in text
     assert "Not clearly different" in o["findings"][1]["sub"]
+
+
+def test_interval_check_says_partly_when_a_little_off(results):
+    import copy
+    pred = pd.read_parquet(results / "elec_heldout_predictions.parquet")
+    o = make_site_elec.build(results)
+    mind = {c["title"]: c for c in o["mind"]}
+    cov = json.loads((results / "elec_heldout_band.json").read_text())["coverage"]
+    status = mind["The 10% to 90% range can be trusted"]["status"]
+    off = abs(cov - 0.8)
+    assert status == ("Holds" if off <= 0.03 else ("Partly" if off <= 0.10 else "Fails"))

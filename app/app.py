@@ -425,15 +425,17 @@ def mind_checks(df):
         pass
     lead = f"The 10 to 90% band caught {raw:.0%} of held-out hours before rounding, and {cov:.0%} after its edges were rounded out to whole trips" if raw is not None \
         else f"The 10 to 90% band, with edges rounded out to whole trips, caught {cov:.0%} of held-out hours"
-    out.append(("holds" if abs((raw if raw is not None else cov) - 0.8) <= 0.1 else "fails", "The yellow band can be trusted",
-                lead + "; an ideal band catches 80%."))
+    off = abs((raw if raw is not None else cov) - 0.8)
+    verdict_ = "holds" if off <= 0.03 else ("partly" if off <= 0.10 else "fails")
+    tail = {"partly": ", so treat it as only roughly right", "holds": "", "fails": ""}[verdict_]
+    out.append((verdict_, "The yellow band can be trusted", lead + "; an ideal band catches 80%" + tail + "."))
     out.append(("untested", "It keeps winning in another month or year",
                 "Only one month was held out, and I have one year of history. I cannot rule this out."))
     return out
 
 
 def mind_box(checks):
-    label = {"holds": "\u2713 Holds", "fails": "\u2715 Fails", "untested": "? Untested"}
+    label = {"holds": "\u2713 Holds", "partly": "~ Partly", "fails": "\u2715 Fails", "untested": "? Untested"}
     rows = "".join(
         f'<div class="mind-row"><span class="chip {st_}">{label[st_]}</span><div><b>{html.escape(ti)}</b>'
         f'<span>{html.escape(de)}</span></div></div>' for st_, ti, de in checks)
@@ -844,8 +846,14 @@ def finding_cards(df, hl, sb, reasons):
         m = sb.set_index("key")["MAE"]
         rel = 100 * (m["ets_weekly"] - m[BASE]) / m[BASE]
         cards.append((f"{abs(rel):.0f}% {'worse' if rel > 0 else 'better'}", "A classic statistical model vs the simple rule",
-                      "Fancier did not mean better. Mixing the main model back toward the simple rule did "
-                      f"{'worse' if m.get('lgbm_plus_' + BASE, 0) > m['lgbm'] else 'no better'} than LightGBM alone."))
+                      "Average miss of exponential smoothing against the simple rule, on held-out days. "
+                      + ("Fancier did not mean better." if rel > 0 else "It did better here.")))
+        combo = "lgbm_plus_" + BASE
+        if combo in m.index:
+            relc = 100 * (m[combo] - m["lgbm"]) / m["lgbm"]
+            same = abs(relc) < 0.5
+            cards.append(("no change" if same else f"{abs(relc):.0f}% {'worse' if relc > 0 else 'better'}", "Blending LightGBM with the simple rule vs LightGBM alone",
+                          "Average miss of the 50-50 blend against LightGBM on its own, on held-out days."))
     s = storm_story(df, reasons)
     if s and s[2] >= 1.5:
         where = {"development": "development period", "held-out": "held-out test"}.get(storm_split(df, reasons), "")

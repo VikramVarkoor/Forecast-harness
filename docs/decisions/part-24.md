@@ -41,3 +41,15 @@
 ## D95: Tests no longer overwrite the real link-preview picture
 - `python -m src.make_site_elec` always wrote `site/assets/og-elec.png`, including when a test ran it on made-up data, so a test run replaced the real picture with one showing the test's numbers. A commit made right after the tests had picked that up.
 - The picture path is now an option (`--og`), the test points it at a temporary folder, and the test checks that the real file is unchanged.
+
+## D96: Interval check can say "Partly"
+- "The range can be trusted" holds within 3 points of the 80% target, says "Partly" within 10 points, and fails beyond that. At 75% the range is 5 points low, so the page now says "Partly" and "a little too narrow, so treat it as optimistic" instead of "Holds". The taxi check uses the raw coverage for the same rule. "Partly" has its own chip.
+
+## D97: Country tiles name the period they describe
+- Each tile now has two lines: the first is the day picked on the slider, the second is the average over all held-out days. The second line uses the same percentage-error comparison as the written paragraph, so the two can no longer look like a contradiction. The caption says which is which.
+
+## D98: Taxi finding cards separated
+- The exponential smoothing result (against the simple rule) and the blend result (against LightGBM alone) are two cards with their own captions. They used to share one caption.
+
+## D99: Two-pixel horizontal scroll removed
+- The per-country figure line used a no-wrap rule that pushed the page 2 px wider than the window at about 1000 to 1200 px. It now wraps.

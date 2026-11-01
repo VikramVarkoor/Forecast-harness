@@ -116,10 +116,11 @@
     var refs = {}, tm = el("div", "tilemap"), POS = { FI: [4, 0], NL: [1, 1], DE: [2, 1], PL: [3, 1], FR: [0, 2], BE: [1, 2], CH: [2, 2], AT: [3, 2], ES: [0, 3], IT: [2, 3] }, tiles = {}, extra = 0;
     D.countries.forEach(function (c) {
       var q = POS[c.code] || [extra++, 4], t1 = el("div", "tile"); t1.style.gridColumn = String(q[0] + 1); t1.style.gridRow = String(q[1] + 1);
-      t1.appendChild(el("b", null, c.code)); t1.appendChild(el("span", "tv", "")); tm.appendChild(t1); tiles[c.code] = t1;
+      t1.appendChild(el("b", null, c.code)); t1.appendChild(el("span", "tv", ""));
+      t1.appendChild(el("span", "tv tv-all", c.flagged ? "" : D.days.length + " days: " + (c.mape_model < c.mape_op ? "model" : "operators") + " by " + Math.abs(c.mape_model - c.mape_op).toFixed(2) + " pts")); tm.appendChild(t1); tiles[c.code] = t1;
     });
     tm.setAttribute("role", "group"); tm.setAttribute("aria-label", "Rough map of the ten countries. Each tile says whether the model or the operators were closer on the chosen day.");
-    main.appendChild(tm); main.appendChild(el("p", "caption", "Cyan tile: the model was closer that day. Amber tile: the operators were. Dashed tile: the operator forecast is not like for like, so no winner is called."));
+    main.appendChild(tm); main.appendChild(el("p", "caption", "Tile colour and the first line are the day picked on the slider: cyan means the model was closer, amber the operators. The second line is the average over all " + D.days.length + " days, the same comparison the written summary uses. Dashed tile: the operator forecast is not like for like, so no winner is called."));
     D.countries.forEach(function (c) {
       var row = el("div", "eurow"), nm = el("div", "eu-name", c.name), svg = sv("svg", { viewBox: "0 0 " + W + " " + Hh, preserveAspectRatio: "none", "aria-hidden": "true" }), fig = el("div", "eu-fig");
       var area = sv("polygon", { fill: "var(--t-model)", opacity: 0.28 }, svg), mp = sv("polyline", { fill: "none", stroke: "var(--t-model)", "stroke-width": 2.2, "vector-effect": "non-scaling-stroke" }, svg), ap = sv("polyline", { fill: "none", stroke: "var(--t-actual)", "stroke-width": 2.4, "vector-effect": "non-scaling-stroke" }, svg);
@@ -133,7 +134,7 @@
         var R = refs[c.code]; R.ap.setAttribute("points", pts(y)); R.mp.setAttribute("points", pts(m));
         R.area.setAttribute("points", pts(m) + " " + y.map(function (v, i) { return X(23 - i) + "," + Y(y[23 - i]); }).join(" "));
         var pct = function (a) { var sum = 0, tot = 0; for (var h = 0; h < 24; h++) { sum += Math.abs(a[h] - y[h]); tot += y[h]; } return 100 * sum / tot; };
-        var pm = pct(m), po = pct(op), T1 = tiles[c.code]; T1.className = "tile " + (R.flag ? "flag" : (pm < po ? "win" : "lose")); T1.querySelector(".tv").textContent = (R.flag ? "not like for like" : (pm < po ? "model by " : "operators by ") + Math.abs(pm - po).toFixed(1) + " pts");
+        var pm = pct(m), po = pct(op), T1 = tiles[c.code]; T1.className = "tile " + (R.flag ? "flag" : (pm < po ? "win" : "lose")); T1.querySelector(".tv").textContent = (R.flag ? "not like for like" : "this day: " + (pm < po ? "model by " : "operators by ") + Math.abs(pm - po).toFixed(1) + " pts");
         R.fig.textContent = "Model " + pct(m).toFixed(1) + "%   Operators " + pct(op).toFixed(1) + "%" + (R.flag ? " (not like for like)" : "");
       });
     }

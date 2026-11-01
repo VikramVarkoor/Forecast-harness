@@ -383,3 +383,25 @@ def test_sources_section_lists_only_files_that_exist(tmp_path, monkeypatch):
     s = mr.sources_section()
     assert "`results/heldout.csv`" in s and "`results/elec_heldout.csv`" in s and "bias_check" not in s
     assert "streamlit run app/app.py" in s
+
+
+def test_band_check_is_partly_not_holds_when_raw_coverage_is_five_points_low(tmp_path, monkeypatch):
+    import app.app as a
+    df = _pred(14, zones=(1, 2, 3)).assign(split="held-out"); df["ts"] = pd.to_datetime(df["ts"])
+    pd.DataFrame({"scope": ["all"], "coverage_raw": [0.75], "coverage_rounded": [0.82]}).to_csv(tmp_path / "heldout_intervals.csv", index=False)
+    monkeypatch.setattr(a, "RES", tmp_path)
+    c = [c for c in a.mind_checks(df) if "band" in c[1]][0]
+    assert c[0] == "partly" and "only roughly right" in c[2]
+    assert "~ Partly" in a.mind_box([c])
+
+
+def test_exponential_smoothing_and_blend_get_separate_cards():
+    import app.app as a
+    sb = pd.DataFrame({"key": ["mean_same_hour_4w", "ets_weekly", "lgbm", "lgbm_plus_mean_same_hour_4w"], "MAE": [36.0, 49.0, 31.0, 33.0]})
+    df = _pred().assign(split="held-out"); df["ts"] = pd.to_datetime(df["ts"])
+    cards = a.finding_cards(df, None, sb, pd.DataFrame(columns=["date", "reason", "source"]))
+    labs = [c[1] for c in cards]
+    assert "A classic statistical model vs the simple rule" in labs and "Blending LightGBM with the simple rule vs LightGBM alone" in labs
+    ets = [c for c in cards if c[1].startswith("A classic")][0]; blend = [c for c in cards if c[1].startswith("Blending")][0]
+    assert "blend" not in ets[2].lower() and "exponential" not in blend[2].lower()
+    assert blend[0] == "6% worse"

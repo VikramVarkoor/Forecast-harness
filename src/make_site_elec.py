@@ -215,8 +215,10 @@ def mind_checks(pred, countries, base, mae, n_days, win_b, band, wx):
     out.append(("Holds" if sane and lvl * 2 >= len(sane) else "Fails", "It keeps up with the operators where the comparison is fair",
                 f"It had the lower or equal percentage error than the operators in {lvl} of {len(sane)} countries whose operator series looks sound. The operators have weather forecasts and the model does not."))
     cov = band["coverage"]
-    out.append(("Holds" if abs(cov - 0.8) <= 0.1 else "Fails", "The 10% to 90% range can be trusted",
-                f"The range caught {cov:.0%} of held-out hours; an ideal range catches 80%."))
+    off = abs(cov - 0.8)
+    out.append(("Holds" if off <= 0.03 else ("Partly" if off <= 0.10 else "Fails"), "The 10% to 90% range can be trusted",
+                f"The range caught {cov:.0%} of held-out hours; an ideal range catches 80%."
+                + (" That is " + ("a little too narrow, so treat it as optimistic." if cov < 0.8 else "wider than it needs to be.") if 0.03 < off <= 0.10 else "")))
     if wx:
         st = wx["stat"]
         if st["ci_lo"] > 0:
