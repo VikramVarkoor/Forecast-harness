@@ -262,8 +262,9 @@ def test_fonts_are_embedded_not_served():
     assert "data:font/woff2;base64," in css and "/app/static" not in css
 
 
-def test_zone_table_spread_and_mind_checks():
+def test_zone_table_spread_and_mind_checks(tmp_path, monkeypatch):
     import app.app as a
+    monkeypatch.setattr(a, "RES", tmp_path)          # no heldout_intervals.csv here, so a real results folder cannot leak into this check
     df = _pred(14, zones=(1, 2, 3)).assign(split="held-out")
     df["ts"] = pd.to_datetime(df["ts"])
     zt = a.zone_table(df, {1: "Alpha"})
