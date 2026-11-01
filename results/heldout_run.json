@@ -1,0 +1,13 @@
+{
+  "runs": [
+    {
+      "started_utc": "2026-10-31T11:34:38+00:00",
+      "args": {
+        "drop_features": [],
+        "best_baseline": "mean_same_hour_4w"
+      },
+      "forced": false,
+      "status": "done"
+    }
+  ]
+}

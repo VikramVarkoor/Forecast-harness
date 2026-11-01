@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-domain="elec">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day-ahead demand forecast, European electricity</title>
+<meta name="description" content="Hourly electricity demand for 10 European countries, forecast a day ahead and tested on 28 days the model never saw.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Can you predict how much electricity Europe will use tomorrow?">
+<meta property="og:description" content="Day-ahead electricity demand for 10 European countries, tested on days the model never saw, next to the grid operators' own forecast.">
+<link rel="icon" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="wrap bar">
+  <div class="barl">
+    <nav class="domain" aria-label="Project">
+      <a href="index.html" data-domain-link>Ride-hail</a>
+      <a href="elec.html" aria-current="page">Electricity</a>
+    </nav>
+    <div class="seg" role="group" aria-label="View">
+      <button type="button" data-view="Story">Story</button>
+      <button type="button" data-view="Dashboard">Dashboard</button>
+    </div>
+  </div>
+  <button type="button" class="switch" id="dark" role="switch" aria-checked="false">
+    <span class="track"><span class="knob"></span></span><span>Dark mode</span>
+  </button>
+</header>
+<section id="hero" class="hero" aria-label="Headline result"></section>
+<div class="checker" aria-hidden="true"></div>
+<main id="main" class="wrap" tabindex="-1"></main>
+<footer id="footer" class="wrap footer"></footer>
+<noscript><p class="wrap">This page draws its charts with JavaScript. Please turn it on to read it.</p></noscript>
+<script src="assets/vendor/vega.min.js"></script>
+<script src="assets/vendor/vega-lite.min.js"></script>
+<script src="assets/vendor/vega-embed.min.js"></script>
+<script src="assets/elec.js"></script>
+</body>
+</html>

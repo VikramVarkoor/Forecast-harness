@@ -1,0 +1,422 @@
+{
+  "rule": {
+    "max_gap_hours": 14,
+    "max_missing_actual_pct": 0.1,
+    "max_missing_tso_pct": 0.2,
+    "n_countries": 10,
+    "since": "2015-01-01"
+  },
+  "chosen": [
+    "DE",
+    "FR",
+    "IT",
+    "ES",
+    "PL",
+    "NL",
+    "BE",
+    "FI",
+    "AT",
+    "CH"
+  ],
+  "first_hour": "2015-01-02 00:00:00",
+  "last_hour": "2020-09-30 22:00:00",
+  "hours": 50375,
+  "hours_filled": {
+    "actual": 71,
+    "tso_left_missing": 240
+  },
+  "table": [
+    {
+      "country": "DE",
+      "mean_load_mw": 55492.469,
+      "missing_actual_pct": 0.0,
+      "longest_gap_h": 0,
+      "missing_tso_pct": 0.048,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "FR",
+      "mean_load_mw": 53249.738,
+      "missing_actual_pct": 0.085,
+      "longest_gap_h": 13,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "IT",
+      "mean_load_mw": 32888.684,
+      "missing_actual_pct": 0.004,
+      "longest_gap_h": 1,
+      "missing_tso_pct": 0.052,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "ES",
+      "mean_load_mw": 28441.6,
+      "missing_actual_pct": 0.044,
+      "longest_gap_h": 8,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "PL",
+      "mean_load_mw": 18947.022,
+      "missing_actual_pct": 0.004,
+      "longest_gap_h": 1,
+      "missing_tso_pct": 0.097,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "UA",
+      "mean_load_mw": 17006.681,
+      "missing_actual_pct": 49.137,
+      "longest_gap_h": 23927,
+      "missing_tso_pct": 49.577,
+      "longest_gap_tso_h": 23951,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "SE",
+      "mean_load_mw": 15519.709,
+      "missing_actual_pct": 0.192,
+      "longest_gap_h": 49,
+      "missing_tso_pct": 0.29,
+      "longest_gap_tso_h": 48,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "NO",
+      "mean_load_mw": 15065.276,
+      "missing_actual_pct": 0.226,
+      "longest_gap_h": 96,
+      "missing_tso_pct": 0.052,
+      "longest_gap_tso_h": 24,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "NL",
+      "mean_load_mw": 12578.438,
+      "missing_actual_pct": 0.0,
+      "longest_gap_h": 0,
+      "missing_tso_pct": 0.0,
+      "longest_gap_tso_h": 0,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "BE",
+      "mean_load_mw": 9808.384,
+      "missing_actual_pct": 0.0,
+      "longest_gap_h": 0,
+      "missing_tso_pct": 0.048,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "FI",
+      "mean_load_mw": 9427.091,
+      "missing_actual_pct": 0.024,
+      "longest_gap_h": 4,
+      "missing_tso_pct": 0.147,
+      "longest_gap_tso_h": 72,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "CZ",
+      "mean_load_mw": 7432.226,
+      "missing_actual_pct": 0.216,
+      "longest_gap_h": 104,
+      "missing_tso_pct": 0.099,
+      "longest_gap_tso_h": 24,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "AT",
+      "mean_load_mw": 7070.149,
+      "missing_actual_pct": 0.0,
+      "longest_gap_h": 0,
+      "missing_tso_pct": 0.0,
+      "longest_gap_tso_h": 0,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "RO",
+      "mean_load_mw": 6742.405,
+      "missing_actual_pct": 0.246,
+      "longest_gap_h": 118,
+      "missing_tso_pct": 0.238,
+      "longest_gap_tso_h": 119,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "CH",
+      "mean_load_mw": 6714.11,
+      "missing_actual_pct": 0.004,
+      "longest_gap_h": 1,
+      "missing_tso_pct": 0.147,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": true
+    },
+    {
+      "country": "GR",
+      "mean_load_mw": 5819.97,
+      "missing_actual_pct": 0.073,
+      "longest_gap_h": 13,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": true,
+      "chosen": false
+    },
+    {
+      "country": "PT",
+      "mean_load_mw": 5657.723,
+      "missing_actual_pct": 0.075,
+      "longest_gap_h": 37,
+      "missing_tso_pct": 0.006,
+      "longest_gap_tso_h": 2,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "HU",
+      "mean_load_mw": 4854.161,
+      "missing_actual_pct": 0.0,
+      "longest_gap_h": 0,
+      "missing_tso_pct": 0.093,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": false
+    },
+    {
+      "country": "RS",
+      "mean_load_mw": 4452.185,
+      "missing_actual_pct": 1.554,
+      "longest_gap_h": 696,
+      "missing_tso_pct": 1.911,
+      "longest_gap_tso_h": 672,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "BG",
+      "mean_load_mw": 4297.193,
+      "missing_actual_pct": 0.127,
+      "longest_gap_h": 37,
+      "missing_tso_pct": 7.331,
+      "longest_gap_tso_h": 3622,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "DK",
+      "mean_load_mw": 3765.951,
+      "missing_actual_pct": 0.004,
+      "longest_gap_h": 1,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": true,
+      "chosen": false
+    },
+    {
+      "country": "SK",
+      "mean_load_mw": 3336.826,
+      "missing_actual_pct": 0.054,
+      "longest_gap_h": 8,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": true,
+      "chosen": false
+    },
+    {
+      "country": "IE",
+      "mean_load_mw": 3191.222,
+      "missing_actual_pct": 1.117,
+      "longest_gap_h": 395,
+      "missing_tso_pct": 0.95,
+      "longest_gap_tso_h": 48,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "HR",
+      "mean_load_mw": 1990.398,
+      "missing_actual_pct": 0.004,
+      "longest_gap_h": 1,
+      "missing_tso_pct": 0.052,
+      "longest_gap_tso_h": 24,
+      "eligible": true,
+      "chosen": false
+    },
+    {
+      "country": "SI",
+      "mean_load_mw": 1462.743,
+      "missing_actual_pct": 0.119,
+      "longest_gap_h": 58,
+      "missing_tso_pct": 0.004,
+      "longest_gap_tso_h": 1,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "LT",
+      "mean_load_mw": 1316.351,
+      "missing_actual_pct": 0.383,
+      "longest_gap_h": 94,
+      "missing_tso_pct": 1.45,
+      "longest_gap_tso_h": 491,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "EE",
+      "mean_load_mw": 929.689,
+      "missing_actual_pct": 0.163,
+      "longest_gap_h": 18,
+      "missing_tso_pct": 0.889,
+      "longest_gap_tso_h": 24,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "LV",
+      "mean_load_mw": 818.639,
+      "missing_actual_pct": 0.073,
+      "longest_gap_h": 14,
+      "missing_tso_pct": 0.383,
+      "longest_gap_tso_h": 25,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "CY",
+      "mean_load_mw": 499.36,
+      "missing_actual_pct": 34.661,
+      "longest_gap_h": 15117,
+      "missing_tso_pct": 57.633,
+      "longest_gap_tso_h": 23870,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "LU",
+      "mean_load_mw": 470.628,
+      "missing_actual_pct": 1.313,
+      "longest_gap_h": 184,
+      "missing_tso_pct": 2.19,
+      "longest_gap_tso_h": 96,
+      "eligible": false,
+      "chosen": false
+    },
+    {
+      "country": "ME",
+      "mean_load_mw": 381.473,
+      "missing_actual_pct": 1.464,
+      "longest_gap_h": 504,
+      "missing_tso_pct": 0.621,
+      "longest_gap_tso_h": 144,
+      "eligible": false,
+      "chosen": false
+    }
+  ],
+  "operator_forecast_mape_pct_by_year": {
+    "DE": {
+      "2015": 3.01,
+      "2016": 3.59,
+      "2017": 2.53,
+      "2018": 2.78,
+      "2019": 3.52,
+      "2020": 2.81
+    },
+    "FR": {
+      "2015": 1.68,
+      "2016": 1.71,
+      "2017": 1.76,
+      "2018": 1.73,
+      "2019": 1.74,
+      "2020": 1.96
+    },
+    "IT": {
+      "2015": 1.95,
+      "2016": 2.15,
+      "2017": 1.9,
+      "2018": 1.91,
+      "2019": 2.26,
+      "2020": 2.33
+    },
+    "ES": {
+      "2015": 1.29,
+      "2016": 1.1,
+      "2017": 1.08,
+      "2018": 0.93,
+      "2019": 0.95,
+      "2020": 1.29
+    },
+    "PL": {
+      "2015": 1.95,
+      "2016": 2.04,
+      "2017": 2.08,
+      "2018": 2.01,
+      "2019": 2.36,
+      "2020": 2.49
+    },
+    "NL": {
+      "2015": 19.55,
+      "2016": 7.67,
+      "2017": 7.38,
+      "2018": 6.56,
+      "2019": 15.45,
+      "2020": 11.76
+    },
+    "BE": {
+      "2015": 2.23,
+      "2016": 2.5,
+      "2017": 2.2,
+      "2018": 2.19,
+      "2019": 2.56,
+      "2020": 3.76
+    },
+    "FI": {
+      "2015": 1.84,
+      "2016": 1.75,
+      "2017": 1.84,
+      "2018": 2.42,
+      "2019": 1.82,
+      "2020": 2.12
+    },
+    "AT": {
+      "2015": 7.83,
+      "2016": 4.42,
+      "2017": 4.76,
+      "2018": 5.46,
+      "2019": 4.55,
+      "2020": 4.14
+    },
+    "CH": {
+      "2015": 12.89,
+      "2016": 6.3,
+      "2017": 8.34,
+      "2018": 9.86,
+      "2019": 10.68,
+      "2020": 7.23
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "runs": [
+    {
+      "started_utc": "2026-10-31T23:52:43+00:00",
+      "window": [
+        "2018-11-03",
+        "2018-11-30"
+      ],
+      "best_baseline": "same_hour_last_week",
+      "status": "done"
+    }
+  ]
+}

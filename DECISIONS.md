@@ -137,3 +137,22 @@ Four, all scored by exactly the same backtest function as any model:
 - Zones and the cut come from development data. The baseline used in the combination is fixed from the development result, not re-picked on these weeks.
 - Expanding window as in production: each origin sees everything before its own midnight, including earlier held-out days. LightGBM refits weekly, so it refits at the held-out origins too.
 - With 28 days there are only 4 weekly blocks, so the paired interval is crude. The held-out headline is the point estimate next to the development result.
+
+## D21. App polish (done)
+
+- Zone dropdown shows "ID: Borough, Zone" from `app/taxi_zone_lookup.csv` (TLC zone lookup, downloaded by the user, committed so the deployed app has it). If the file is missing the app shows bare IDs.
+- Chart: legend moved below the plot, hour-only axis labels, smaller fonts.
+
+## D22. App and README polish (done)
+
+- headline held-out metrics at the top of the app, Forecast and About tabs, interval toggle, TLC zone lookup credit in the README generator.
+
+## D23. App redesign (done)
+
+- Dark theme in `.streamlit/config.toml`. Colors: amber for LightGBM, blue for the baseline, light gray for actuals; amber and blue checked with the dataviz validator against the dark surface.
+- Interactive Altair charts with hover. New "Where it fails" tab: daily error over time with verified-cause days circled (from `docs/day_reasons.csv`), and an hour-by-weekday heatmap of where LightGBM beats the baseline.
+
+## D24. App identity (done)
+
+- Light "cab" look: taxi-yellow hero band with one large black number, cream surface, ink-black actuals, cobalt for LightGBM, neutral gray dashed for the baseline, taxi-yellow for the interval band and held-out period, orange for verified-cause days. Cobalt and orange pass the dataviz validator on the cream surface; the gray baseline is a deliberate neutral.
+- Font: Archivo, loaded from Google Fonts by CSS import with Arial Narrow and system fallbacks.

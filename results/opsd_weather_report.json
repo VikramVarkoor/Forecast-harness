@@ -1,0 +1,19 @@
+{
+  "countries": [
+    "DE",
+    "FR",
+    "IT",
+    "ES",
+    "PL",
+    "NL",
+    "BE",
+    "FI",
+    "AT",
+    "CH"
+  ],
+  "first": "1980-01-01 00:00:00",
+  "last": "2019-12-31 23:00:00",
+  "hours_missing_in_load_span": 0,
+  "temp_min_c": -37.513,
+  "temp_max_c": 37.918
+}
