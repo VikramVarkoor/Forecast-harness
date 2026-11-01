@@ -136,6 +136,35 @@ def bias_finding():
             f"Held-out bias by model: {pairs}. That fits demand running above the recent history, but why (season, events, weather) was not tested.{mae_note}")
 
 
+SOURCES = [
+    ("A. Taxi", [("Held-out MAE, RMSE, bias, MASE", "heldout.csv"), ("Days won, paired gain and its range", "heldout_paired.csv"),
+                 ("Development backtest table", "models.csv"), ("Interval coverage, raw and rounded", "heldout_intervals.csv"),
+                 ("Held-out bias check", "bias_check.json"), ("Ablation without the short-lag features", "models_nolag.csv"),
+                 ("How many times the held-out weeks were scored", "heldout_run.json")]),
+    ("B. Electricity", [("Held-out table, MAE and MAPE per model", "elec_heldout.csv"), ("Per-country results", "elec_heldout_by_country.csv"),
+                        ("Model against the baseline and the grid operators, paired", "elec_heldout_paired.csv"),
+                        ("10% to 90% range coverage", "elec_heldout_band.json"), ("Data span, hours, gaps, chosen countries", "elec_data_report.json"),
+                        ("Baseline chosen on development data", "elec_dev_best.txt"), ("Weather test, by model", "elec_weather_models.csv"),
+                        ("Weather test, paired gain and its range", "elec_weather_paired.csv"),
+                        ("How many times the held-out days were scored", "elec_heldout_run.json")]),
+]
+
+
+def sources_section():
+    """Which results file backs which headline number. Lists only files that exist."""
+    rows = []
+    for dom, items in SOURCES:
+        for what, name in items:
+            if (R / name).exists():
+                rows.append(f"| {dom} | {what} | `results/{name}` |")
+    if not rows:
+        return ""
+    return ("## Where the numbers come from\n\nEvery figure above is read from one of these files, so it can be checked against the source.\n\n"
+            "| Domain | Number | File |\n|---|---|---|\n" + "\n".join(rows) + "\n\n"
+            "`app/app.py` is the original Streamlit dashboard for the taxi results (`streamlit run app/app.py`). "
+            "The static site generator reuses its data code, so it stays in the repository.\n")
+
+
 def combine(taxi):
     """Two domains in one README: Domain A headings demoted one level, Domain B appended."""
     a = re.sub(r"^## ", "### ", taxi, flags=re.M)
@@ -143,7 +172,7 @@ def combine(taxi):
     head = ("# Day-ahead forecasting, two domains\n\nTwo forecasting projects built with the same discipline: forecasts made from the night before, "
             "a held-out period scored once, simple baselines beside every model, and results reported whatever they came out as. "
             "Decisions are logged in `DECISIONS.md` and `docs/decisions/`.\n\n")
-    return head + a.rstrip() + "\n\n" + elec_section() + "\n"
+    return head + a.rstrip() + "\n\n" + elec_section() + "\n\n" + sources_section()
 
 
 def main():
@@ -175,9 +204,9 @@ def main():
     if nolag is not None:
         f.append(f"- Ablation (rule in DECISIONS D18): dropping the two short-lag features moved development MASE "
                  f"from {dev.loc['lgbm', 'MASE']:.3f} to {nolag.loc['lgbm', 'MASE']:.3f}.")
-    f.append(f"- The 10% to 90% interval covered {hc.loc['all', 'coverage_rounded'] * 100:.0f}% of held-out hours after rounding edges "
-             f"outward to whole trips (raw {hc.loc['all', 'coverage_raw'] * 100:.0f}%). In quiet zones the raw interval covers "
-             f"{hc.loc['quiet', 'coverage_raw'] * 100:.0f}% because counts are integers, so rounded coverage there "
+    f.append(f"- The 10% to 90% interval is meant to cover 80% of hours. Raw coverage on held-out hours was {hc.loc['all', 'coverage_raw'] * 100:.0f}%. "
+             f"After rounding the edges outward to whole trips it was {hc.loc['all', 'coverage_rounded'] * 100:.0f}%. That rounding is not a calibration, it only "
+             f"reflects that trip counts are integers. In quiet zones raw coverage is {hc.loc['quiet', 'coverage_raw'] * 100:.0f}%, and the rounded figure there "
              f"({hc.loc['quiet', 'coverage_rounded'] * 100:.0f}%) mostly reflects zero-heavy hours.")
     f.append(f"- Held-out bias (forecast minus actual, trips per zone-hour) was negative for {len(bias_neg)} of {len(held)} "
              f"models; LightGBM {held.loc['lgbm', 'bias']:.1f}." + (bias_finding() or " Demand ran above what the history implied; the cause was not investigated."))

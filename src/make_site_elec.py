@@ -136,7 +136,7 @@ def build(res: Path):
                      win_base=win_b, win_op=win_o, n_days=n_days, flag_pct=FLAG_PCT),
         series=series, days=[dict(iso=str(pd.Timestamp(d).date()), label=label(d)) for d in days], worst=worst,
         findings=[dict(big=f"{abs(gain):.1f}%", lab=f"{'lower' if better else 'higher'} average error in MW than the simple guess", sub=f"{mae['lgbm']:.0f} MW against {mae[base]:.0f} MW, on {n_days} days never seen. The model had the lower error on {win_b} of them."),
-                  dict(big=f"{win_o}/{n_days}", lab="days beating the operators' forecast", sub=f"Average error {mae['lgbm']:.0f} MW against {mae[OP]:.0f} MW. " + op_summary),
+                  dict(big=f"{win_o}/{n_days}", lab="days with a lower error than the operators' forecast", sub=op_summary + f" Average error {mae['lgbm']:.0f} MW against {mae[OP]:.0f} MW; the model was lower on {win_o} of {n_days} days, which is context, not the conclusion."),
                   dict(big=f"{band['coverage'] * 100:.0f}%", lab="of actual hours inside the 10% to 90% range", sub="It should be about 80%. " + band_note)],
         timeline=dict(dev=DEV_DAYS, held=int(n_days)),
         steps=[dict(lab="Forecast from midnight", sub="Each day, the model sees only data from before that moment and forecasts the next 24 hours for every country."),

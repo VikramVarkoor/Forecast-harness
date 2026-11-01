@@ -478,7 +478,7 @@
     box.appendChild(note("City-wide pickups across all 30 zones. Each cause below was checked against a news source."));
     var un = D.unexplained;
     box.appendChild(note("Only days where I read a source for the cause are listed. " + (un.length ? un.length + " other day" + (un.length !== 1 ? "s" : "") + " had a miss at least 1.5 times the typical day (" + un.slice(0, 8).join(", ") + (un.length > 8 ? ", and more" : "") + "). I did not look up their causes, so none are guessed." : "No other day had a miss that large.")));
-    box.appendChild(select("Day", S.map(function (x, i) { return { value: i, label: x.label + ": " + x.cause }; }), ui.storm, function (v) { ui.storm = +v; renderTab(); }));
+    box.appendChild(select("Day", S.map(function (x, i) { return { value: i, label: x.label + " (" + (x.split === "held-out" ? "held-out" : "development") + "): " + x.cause }; }), ui.storm, function (v) { ui.storm = +v; renderTab(); }));
     var wrapHost = el("div", "wxhost"), host = el("div", "chart"); wrapHost.appendChild(host);
     var acts = shareButtons(host, function () { return Promise.resolve(host._r); }, "storm-" + s.date);
     box.appendChild(chartbar(H.tipPill("Hover over the chart to read the numbers."), acts)); box.appendChild(wrapHost);

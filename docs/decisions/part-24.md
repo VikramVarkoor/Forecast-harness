@@ -24,3 +24,16 @@
 ## D90: Two failing tests fixed
 - The dropdown test expected bare zone IDs, but the labels carry names when the TLC lookup file is present. It now compares the ID before the colon.
 - `src/make_zone_geojson.py` was missing from the working tree, so its test could not import it. It is added.
+
+## D91: Electricity operator card leads with the conclusion
+- The card's number is still the count of days the model had the lower error (shown as a fraction of the held-out days), but its text now opens with the conclusion ("Not clearly different overall") and gives the day count as context. The count leans one way and the 95% range includes zero, so the conclusion is the range.
+
+## D92: Development and held-out numbers are labelled
+- The storm days are all in the development period (January and February), while the headline win count is on held-out days. The verdict now reads "won on N of M held-out days", and when the largest miss was a development-period storm it says so instead of "a winter storm still broke it".
+- The storm card, the storm paragraph in the summary, the Storm days tab dropdown and the "what would change" line each name the period.
+
+## D93: Interval coverage leads with the raw figure
+- The README and the "yellow band can be trusted" check give the raw coverage first, then the figure after rounding the edges outward to whole trips, and name 80% as the target. The README says the rounding is not a calibration.
+
+## D94: README lists the file behind each headline number
+- A "Where the numbers come from" section is generated from the results folder and lists only files that exist. It also states that `app/app.py` is the original Streamlit dashboard and that the static site generator reuses its data code, which is why it stays.

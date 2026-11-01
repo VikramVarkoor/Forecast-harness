@@ -159,7 +159,9 @@ def test_plain_english_summary_uses_the_numbers():
 def test_verdict_only_says_what_the_numbers_say():
     import app.app as a
     hl = (31.38, 36.37, 13.7, 28)
-    assert a.verdict(hl, 2.4, (26, 28)) == "The model won on 26 of 28 days. A winter storm still broke it."
+    assert a.verdict(hl, 2.4, (26, 28)) == "The model won on 26 of 28 held-out days. A winter storm still broke it."
+    dev_storm = a.verdict(hl, 2.4, (26, 28), "development")
+    assert "development period" in dev_storm and "still broke it" not in dev_storm
     assert "storm" not in a.verdict(hl, 1.1, (26, 28)) and "storm" not in a.verdict(hl, None)
     assert "13.7" not in a.verdict(hl, None, (26, 28))      # the hero already says the percentage
     assert "30 parts" in a.verdict(None)
@@ -348,3 +350,35 @@ def test_bias_finding_uses_the_check_file_and_falls_back(tmp_path, monkeypatch):
     s = mr.bias_finding()
     assert "+1.3" in s and "4.6% above" in s and "20 of 30 zones" in s and "54%" in s
     assert "21:00 (-15.7)" in s and "3:00 (+0.2)" in s and "was not tested" in s and "26%" in s
+
+
+def test_storm_period_is_named_so_it_is_not_read_as_a_held_out_miss():
+    import app.app as a
+    df = _pred()
+    df["split"] = np.where(df["origin"] < pd.Timestamp("2026-01-08"), "development", "held-out")
+    df["ts"] = pd.to_datetime(df["ts"]); df["lgbm"] = df["y"]
+    df.loc[df["origin"] == pd.Timestamp("2026-01-05"), "lgbm"] += 50
+    reasons = pd.DataFrame({"date": [pd.Timestamp("2026-01-05")], "reason": ["Blizzard; travel ban"], "source": ["http://x"]})
+    assert a.storm_split(df, reasons) == "development"
+    cards = a.finding_cards(df, None, pd.DataFrame(), reasons)
+    assert any("development period" in c[1] for c in cards)
+    assert any("development period" in s for s in a.plain_summary(df, (1.0, 2.0, 50.0, 14), {}, reasons))
+
+
+def test_coverage_check_leads_with_raw_and_says_rounding_is_not_calibration(tmp_path, monkeypatch):
+    import app.app as a
+    df = _pred(14, zones=(1, 2, 3)).assign(split="held-out"); df["ts"] = pd.to_datetime(df["ts"])
+    pd.DataFrame({"scope": ["all"], "coverage_raw": [0.75], "coverage_rounded": [0.82]}).to_csv(tmp_path / "heldout_intervals.csv", index=False)
+    monkeypatch.setattr(a, "RES", tmp_path)
+    text = [c for c in a.mind_checks(df) if "band" in c[1]][0][2]
+    assert text.index("75%") < text.index("100%") and "before rounding" in text and "ideal band catches 80%" in text
+
+
+def test_sources_section_lists_only_files_that_exist(tmp_path, monkeypatch):
+    from src import make_readme as mr
+    monkeypatch.setattr(mr, "R", tmp_path)
+    assert mr.sources_section() == ""
+    (tmp_path / "heldout.csv").write_text("x"); (tmp_path / "elec_heldout.csv").write_text("x")
+    s = mr.sources_section()
+    assert "`results/heldout.csv`" in s and "`results/elec_heldout.csv`" in s and "bias_check" not in s
+    assert "streamlit run app/app.py" in s

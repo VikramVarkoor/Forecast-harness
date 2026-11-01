@@ -57,7 +57,7 @@ FLEET = dict(
         ]),
         dict(title="What would change", sub="Planned, not built", items=[
             "Their own demand and supply data instead of public trip records.",
-            "Weather, events and prices as inputs. Storm days were the largest errors here.",
+            "Weather, events and prices as inputs. Storm days, all in the development period, were the largest errors here.",
             "Finer zones, and a rule for brand-new zones with no history.",
             "A forecast with a range, scored on what a wrong forecast costs dispatch, not only on average error.",
             "Monitoring to catch the model drifting after launch.",
@@ -115,7 +115,7 @@ def story(A):
     return dict(
         game=game_day(A, df, zone, day), games=game_rounds(A, df, zone, day),
         hero=A.hero_copy(hl), hero_compact=A.hero_copy(hl, compact=True),
-        verdict=A.verdict(hl, storm[2] if storm else None, A.day_wins(df)),
+        verdict=A.verdict(hl, storm[2] if storm else None, A.day_wins(df), A.storm_split(df, reasons)),
         plain=A.plain_summary(df, hl, names, reasons),
         up_close=dict(zone=int(zone), place=names.get(int(zone)) or f"zone {int(zone)}", date=f"{day:%A %d %B}", rows=rows,
                       takeaway=A.day_takeaway(d, day),
@@ -167,7 +167,7 @@ def dashboard(A):
     if not reasons.empty:
         for r in reasons.merge(g, on="date").itertuples():
             d = df[df["origin"].dt.normalize() == r.date].groupby("ts")[["y", "lgbm", A.BASE]].sum().reset_index()
-            storm.append(dict(date=f"{r.date:%Y-%m-%d}", label=f"{r.date:%a %d %b %Y}", reason=str(r.reason), cause=str(r.reason).split(";")[0],
+            storm.append(dict(date=f"{r.date:%Y-%m-%d}", label=f"{r.date:%a %d %b %Y}", split=str(r.split), reason=str(r.reason), cause=str(r.reason).split(";")[0],
                               source=str(r.source), model=float(r.model), base=float(r.base),
                               rows=[dict(ts=x.ts.isoformat(), y=round(float(x.y), 1), lgbm=round(float(x.lgbm), 1), base=round(float(getattr(x, A.BASE)), 1))
                                     for x in d.itertuples()]))

@@ -418,8 +418,15 @@ def mind_checks(df):
         out.append(("holds" if wins * 2 >= len(g) else "fails", "It wins on most days, not a few lucky ones",
                     f"It beat the rule on {wins} of {len(g)} held-out days."))
     cov = ((h["y"] >= h["q10_int"]) & (h["y"] <= h["q90_int"])).mean()
-    out.append(("holds" if abs(cov - 0.8) <= 0.1 else "fails", "The yellow band can be trusted",
-                f"The 10 to 90% band caught {cov:.0%} of held-out hours; an ideal band catches 80%."))
+    raw = None
+    try:
+        raw = float(pd.read_csv(RES / "heldout_intervals.csv").set_index("scope").loc["all", "coverage_raw"])
+    except Exception:
+        pass
+    lead = f"The 10 to 90% band caught {raw:.0%} of held-out hours before rounding, and {cov:.0%} after its edges were rounded out to whole trips" if raw is not None \
+        else f"The 10 to 90% band, with edges rounded out to whole trips, caught {cov:.0%} of held-out hours"
+    out.append(("holds" if abs((raw if raw is not None else cov) - 0.8) <= 0.1 else "fails", "The yellow band can be trusted",
+                lead + "; an ideal band catches 80%."))
     out.append(("untested", "It keeps winning in another month or year",
                 "Only one month was held out, and I have one year of history. I cannot rule this out."))
     return out
@@ -458,8 +465,7 @@ def compare_takeaway(items, day):
             f"where the rule missed by {l[2]:.1f} rides an hour and the model by {l[1]:.1f}.")
 
 
-def storm_story(df, reasons):
-    """The reason day whose model error was the largest multiple of the median day. None if no match."""
+def _storm_row(df, reasons):
     g = daily_error(df)
     if g.empty or reasons.empty:
         return None
@@ -467,8 +473,22 @@ def storm_story(df, reasons):
     r = reasons.merge(g, on="date")
     if r.empty:
         return None
-    r = r.assign(ratio=r["model"] / med).sort_values("ratio", ascending=False).iloc[0]
-    return r["date"], str(r["reason"]).split(";")[0].strip(), float(r["ratio"])
+    return r.assign(ratio=r["model"] / med).sort_values("ratio", ascending=False).iloc[0]
+
+
+def storm_story(df, reasons):
+    """The reason day whose model error was the largest multiple of the median day. None if no match."""
+    r = _storm_row(df, reasons)
+    return None if r is None else (r["date"], str(r["reason"]).split(";")[0].strip(), float(r["ratio"]))
+
+
+def storm_split(df, reasons):
+    """'development' or 'held-out': which part of the data that storm day sits in. None if no match."""
+    r = _storm_row(df, reasons)
+    return None if r is None else str(r["split"])
+
+
+PERIOD = {"development": "in the development period, before the held-out test", "held-out": "in the held-out test"}
 
 
 def style(chart, t):
@@ -762,9 +782,11 @@ def plain_summary(df, hl, names, reasons=None):
         m, b = (hz["lgbm"] - hz["y"]).abs().mean(), (hz[BASE] - hz["y"]).abs().mean()
         label = names.get(z, f"zone {z}")
         out.append(f"In the busiest zone ({label}), the model missed by about {m:.0f} rides an hour against {b:.0f} for the simple guess.")
-        s = storm_story(df, day_reasons() if reasons is None else reasons)
+        rs = day_reasons() if reasons is None else reasons
+        s = storm_story(df, rs)
         if s and s[2] >= 1.5:
-            out.append(f"It has one big blind spot: the weather. The worst day was {s[0]:%d %B} (cause: {html.escape(s[1])}), when its average miss was "
+            when = PERIOD.get(storm_split(df, rs), "")
+            out.append(f"It has one big blind spot: the weather. The worst day was {s[0]:%d %B}{', ' + when if when else ''} (cause: {html.escape(s[1])}), when its average miss was "
                        f"<b>{s[2]:.1f} times</b> a typical day's. The model cannot see the weather, so a storm like that catches it out. "
                        "The Storm days tab in the dashboard has the details.")
     return out
@@ -777,12 +799,14 @@ def day_wins(df):
     return (int((g["model"] < g["base"]).sum()), len(g)) if len(g) else None
 
 
-def verdict(hl, storm_ratio=None, wins=None):
+def verdict(hl, storm_ratio=None, wins=None, storm_where=None):
     """One honest sentence under the hero. It says something the hero does not: how often the model won, not by how much."""
     if not hl:
         return "Forecasting hourly ride demand for 30 parts of New York."
-    lead = (f"The model won on {wins[0]} of {wins[1]} days." if wins else "The model was tested on days it had never seen.")
+    lead = (f"The model won on {wins[0]} of {wins[1]} held-out days." if wins else "The model was tested on days it had never seen.")
     if storm_ratio and storm_ratio >= 1.5:
+        if storm_where == "development":
+            return lead + " Its largest miss, a winter storm, was in the development period, before the held-out test."
         return lead + " A winter storm still broke it."
     return lead
 
@@ -815,7 +839,7 @@ def finding_cards(df, hl, sb, reasons):
     cards = []
     if hl:
         cards.append((f"{hl[2]:.1f}%", "Fewer misses than the simple rule",
-                      f"Average miss {hl[0]:.2f} against {hl[1]:.2f} rides per zone per hour, on {hl[3]} days the model never saw."))
+                      f"Average miss {hl[0]:.2f} against {hl[1]:.2f} rides per zone per hour, on {hl[3]} held-out days the model never saw."))
     if not sb.empty and {"ets_weekly", BASE, "lgbm"} <= set(sb["key"]):
         m = sb.set_index("key")["MAE"]
         rel = 100 * (m["ets_weekly"] - m[BASE]) / m[BASE]
@@ -824,7 +848,8 @@ def finding_cards(df, hl, sb, reasons):
                       f"{'worse' if m.get('lgbm_plus_' + BASE, 0) > m['lgbm'] else 'no better'} than LightGBM alone."))
     s = storm_story(df, reasons)
     if s and s[2] >= 1.5:
-        cards.append((f"{s[2]:.1f}x", f"{s[1]} on {s[0]:%d %b}: storms still fool it",
+        where = {"development": "development period", "held-out": "held-out test"}.get(storm_split(df, reasons), "")
+        cards.append((f"{s[2]:.1f}x", f"{s[1]} on {s[0]:%d %b}{' (' + where + ')' if where else ''}: storms still fool it",
                       "the median daily error. Nothing in the model knows the weather."))
     return cards
 
@@ -850,7 +875,7 @@ def evidence_section():
 def story(df, hl, t):
     sb, reasons = scoreboard(), day_reasons()
     storm = storm_story(df, day_reasons())
-    st.markdown(f'<p class="verdict">{verdict(hl, storm[2] if storm else None, day_wins(df))}</p>', unsafe_allow_html=True)
+    st.markdown(f'<p class="verdict">{verdict(hl, storm[2] if storm else None, day_wins(df), storm_split(df, day_reasons()))}</p>', unsafe_allow_html=True)
     st.markdown('<div class="plain">' + "".join(f"<p>{p}</p>" for p in plain_summary(df, hl, zone_names())) + "</div>",
                 unsafe_allow_html=True)
     zone, day, d = story_day(df)

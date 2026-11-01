@@ -15,7 +15,7 @@ Every number below is written by `python -m src.make_readme` from files in `resu
 - Exponential smoothing ranks 5 of 7 on held-out MASE (1.234), behind the 4-week mean (0.954). It did not earn its place.
 - Averaging LightGBM with the best baseline gave MAE 33.18 against 31.38 for LightGBM alone, so the combination did not help.
 - Ablation (rule in DECISIONS D18): dropping the two short-lag features moved development MASE from 0.784 to 0.860.
-- The 10% to 90% interval covered 82% of held-out hours after rounding edges outward to whole trips (raw 75%). In quiet zones the raw interval covers 59% because counts are integers, so rounded coverage there (96%) mostly reflects zero-heavy hours.
+- The 10% to 90% interval is meant to cover 80% of hours. Raw coverage on held-out hours was 75%. After rounding the edges outward to whole trips it was 82%. That rounding is not a calibration, it only reflects that trip counts are integers. In quiet zones raw coverage is 59%, and the rounded figure there (96%) mostly reflects zero-heavy hours.
 - Held-out bias (forecast minus actual, trips per zone-hour) was negative for 5 of 7 models; LightGBM -8.0. Development days were +1.3. Mean demand in the held-out weeks ran 4.6% above the development average. The shortfall was spread out (20 of 30 zones and 20 of 28 days were negative), but the 5 worst zones carry 54% of it (LaGuardia Airport, TriBeCa/Civic Center, Times Sq/Theatre District, West Chelsea/Hudson Yards, Midtown Center). By hour it is largest at 21:00 (-15.7) and smallest at 3:00 (+0.2). Held-out bias by model: 4-week mean -13.6, LightGBM -8.0, same hour last week -5.4, same hour yesterday -0.7. That fits demand running above the recent history, but why (season, events, weather) was not tested. The bias is about 26% of LightGBM's MAE, so most of the miss is not bias.
 
 Held-out result table (lower is better; MASE under 1 beats the seasonal naive of lag 168):
@@ -194,3 +194,28 @@ Hourly load and operator forecasts from Open Power System Data (originally the E
 Weather: Open Power System Data. 2020. Data Package Weather Data. Version 2020-09-16. https://doi.org/10.25832/weather_data/2020-09-16.
 The OPSD pages I read do not state a licence in the page text. I did not verify one, so check the data package metadata before redistributing derived data. Raw data is not in this repository.
 
+
+## Where the numbers come from
+
+Every figure above is read from one of these files, so it can be checked against the source.
+
+| Domain | Number | File |
+|---|---|---|
+| A. Taxi | Held-out MAE, RMSE, bias, MASE | `results/heldout.csv` |
+| A. Taxi | Days won, paired gain and its range | `results/heldout_paired.csv` |
+| A. Taxi | Development backtest table | `results/models.csv` |
+| A. Taxi | Interval coverage, raw and rounded | `results/heldout_intervals.csv` |
+| A. Taxi | Held-out bias check | `results/bias_check.json` |
+| A. Taxi | Ablation without the short-lag features | `results/models_nolag.csv` |
+| A. Taxi | How many times the held-out weeks were scored | `results/heldout_run.json` |
+| B. Electricity | Held-out table, MAE and MAPE per model | `results/elec_heldout.csv` |
+| B. Electricity | Per-country results | `results/elec_heldout_by_country.csv` |
+| B. Electricity | Model against the baseline and the grid operators, paired | `results/elec_heldout_paired.csv` |
+| B. Electricity | 10% to 90% range coverage | `results/elec_heldout_band.json` |
+| B. Electricity | Data span, hours, gaps, chosen countries | `results/elec_data_report.json` |
+| B. Electricity | Baseline chosen on development data | `results/elec_dev_best.txt` |
+| B. Electricity | Weather test, by model | `results/elec_weather_models.csv` |
+| B. Electricity | Weather test, paired gain and its range | `results/elec_weather_paired.csv` |
+| B. Electricity | How many times the held-out days were scored | `results/elec_heldout_run.json` |
+
+`app/app.py` is the original Streamlit dashboard for the taxi results (`streamlit run app/app.py`). The static site generator reuses its data code, so it stays in the repository.
