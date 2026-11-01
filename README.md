@@ -98,5 +98,3 @@ streamlit run app/app.py
 
 NYC Taxi and Limousine Commission, TLC Trip Record Data (HVFHV). Zone names from the TLC Taxi Zone Lookup Table (`app/taxi_zone_lookup.csv`). Holidays from the `holidays` package. The TLC terms of use were not
 verified in this project; check them before redistributing derived data. Raw data is not in this repository.
-
-Built with AI assistance (Claude) for code and drafting; the decisions log, runs and checks are mine to explain.
