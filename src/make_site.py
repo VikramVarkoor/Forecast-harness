@@ -221,13 +221,16 @@ def main():
         keep = {"type": "FeatureCollection", "features": [dict(type="Feature", properties=dict(zone=int(f["properties"]["zone"])), geometry=f["geometry"]) for f in geo["features"]]}
         (out / "zones.geojson").write_text(json.dumps(keep, separators=(",", ":")))
     if args.site_url:
-        idx = ROOT / "site" / "index.html"
-        base = args.site_url.rstrip("/") + "/"
-        txt = idx.read_text()
         import re
-        txt = re.sub(r'(<meta property="og:image" content=")[^"]*(")', rf"\g<1>{base}assets/og.png\g<2>", txt)
-        txt = re.sub(r'(<meta property="og:url" content=")[^"]*(")', rf"\g<1>{base}\g<2>", txt)
-        idx.write_text(txt)
+        base = args.site_url.rstrip("/") + "/"
+        for name, img in (("index.html", "og.png"), ("elec.html", "og-elec.png")):
+            pg = ROOT / "site" / name
+            if not pg.exists():
+                continue
+            txt = pg.read_text()
+            txt = re.sub(r'(<meta property="og:image" content=")[^"]*(")', rf"\g<1>{base}assets/{img}\g<2>", txt)
+            txt = re.sub(r'(<meta property="og:url" content=")[^"]*(")', rf"\g<1>{base}{'' if name == 'index.html' else name}\g<2>", txt)
+            pg.write_text(txt)
     (out / "theme.json").write_text(json.dumps(dict(themes=A.THEMES, taxi=A.TAXI)))
     print(f"wrote {out}/story.json and theme.json")
     if (Path(args.results) / "elec_heldout_predictions.parquet").exists():     # Domain B results present: build the Electricity page data too
